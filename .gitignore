@@ -1,0 +1,11 @@
+node_modules/
+.env
+# runtime data (re-created from data/seed on first start / npm run reset)
+data/*.json
+storage/outbox/*
+!storage/outbox/.gitkeep
+public/uploads/*
+!public/uploads/.gitkeep
+*.log
+.DS_Store
+test-results/
