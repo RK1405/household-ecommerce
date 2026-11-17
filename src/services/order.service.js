@@ -21,7 +21,7 @@ async function placeOrder(user, body) {
   const cart = repo.carts.getByUser(user.id);
   if (!cart.items.length) throw new HttpError(400, 'Your cart is empty.');
   const paymentMethod = body.paymentMethod === 'COD' ? 'COD' : 'ONLINE';
-  const q = pricing.quote(cart.items, { couponCode: body.couponCode ?? cart.couponCode, user, deliveryMethod: body.deliveryMethod });
+  const q = pricing.quote(cart.items, { couponCode: 'couponCode' in body ? body.couponCode : cart.couponCode, user, deliveryMethod: body.deliveryMethod });
   if (q.issues.length) throw new HttpError(409, q.issues.map((i) => i.message).join(' '));
   if (q.coupon && !q.coupon.valid) throw new HttpError(400, q.coupon.message);
   if (paymentMethod === 'COD' && !q.codAvailable) throw new HttpError(400, q.codMessage || 'Cash on Delivery is not available for this order.');

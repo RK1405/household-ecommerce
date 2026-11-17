@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en-IN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Secure payment | {store}</title>
+  <meta name="description" content="Pay securely with UPI or card">
+  <meta name="theme-color" content="#0f766e">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/css/tokens.css">
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/store.css">
+</head>
+<body>
+  <div id="site-header"></div>
+  <main id="main" tabindex="-1">
+    <div class="container">
+      <div class="steps" aria-label="Checkout progress" style="justify-content:center"><span class="st done"><span class="n">✓</span>Cart</span><span class="sep"></span><span class="st done"><span class="n">✓</span>Address</span><span class="sep"></span><span class="st active"><span class="n">3</span>Payment</span><span class="sep"></span><span class="st"><span class="n">4</span>Done</span></div>
+      <div class="gateway" id="gateway" aria-live="polite"><div class="gateway-body"><div class="skeleton" style="height:260px"></div></div></div>
+      <p class="xs muted" style="text-align:center">🧪 This is a <strong>dummy payment gateway</strong> for the demo — no real money moves. It follows Razorpay’s order → authorise → verify signature → capture flow and will be swapped for Razorpay Checkout later.</p>
+    </div>
+  </main>
+  <div id="site-footer"></div>
+  <script type="module" src="/js/pages/payment.js"></script>
+</body>
+</html>

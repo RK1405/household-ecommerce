@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en-IN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>My account | {store}</title>
+  <meta name="description" content="Manage your profile, addresses and orders">
+  <meta name="theme-color" content="#0f766e">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/css/tokens.css">
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/store.css">
+</head>
+<body>
+  <div id="site-header"></div>
+  <main id="main" tabindex="-1">
+    <div class="container">
+      <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Home</a></li><li aria-current="page">My account</li></ol></nav>
+      <h1 style="font-size:var(--fs-2xl)" id="hello">My account</h1>
+      <div class="account-layout">
+        <nav class="side-nav" role="tablist" aria-label="Account sections">
+          <button role="tab" data-tab="orders" aria-selected="true">📦 Orders & tracking</button>
+          <button role="tab" data-tab="addresses" aria-selected="false">📍 Saved addresses</button>
+          <button role="tab" data-tab="profile" aria-selected="false">👤 Profile</button>
+          <button role="tab" data-tab="security" aria-selected="false">🔑 Password</button>
+          <button role="tab" data-tab="logout" aria-selected="false">↩️ Logout</button>
+        </nav>
+        <section id="acc-panel" role="tabpanel" aria-live="polite"></section>
+      </div>
+    </div>
+  </main>
+  <div id="site-footer"></div>
+  <script type="module" src="/js/pages/account.js"></script>
+</body>
+</html>

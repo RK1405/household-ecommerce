@@ -373,3 +373,4 @@ body.has-sticky .chat-fab { bottom: calc(var(--bottom-nav-h) + 86px); }
   body { background: #fff; padding: 0 !important; }
 }
 .site-footer .icon { width: 16px; height: 16px; vertical-align: -3px; margin-right: 4px; }
+.contact-grid .icon { width: 18px; height: 18px; vertical-align: -4px; color: var(--c-primary); }

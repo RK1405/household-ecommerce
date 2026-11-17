@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en-IN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Your cart | {store}</title>
+  <meta name="description" content="Your shopping cart">
+  <meta name="theme-color" content="#0f766e">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/css/tokens.css">
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/store.css">
+</head>
+<body>
+  <div id="site-header"></div>
+  <main id="main" tabindex="-1">
+    <div class="container cart-page">
+      <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Home</a></li><li aria-current="page">Cart</li></ol></nav>
+      <h1 style="font-size:var(--fs-2xl)">Shopping cart</h1>
+      <div id="cart-root"><div class="skeleton" style="height:240px"></div></div>
+    </div>
+  </main>
+  <div id="site-footer"></div>
+  <script type="module" src="/js/pages/cart.js"></script>
+</body>
+</html>
