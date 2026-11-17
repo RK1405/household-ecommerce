@@ -86,9 +86,9 @@ function buildSeed(now = Date.now()) {
   const orders = [];
   const payments = [];
   const customers = users.filter((u) => u.role === 'user');
-  for (let n = 0; n < 64; n++) {
+  for (let n = 0; n < 140; n++) {
     const u = customers[n % customers.length];
-    const ageDays = Math.floor(rnd() * 75) + 1;
+    const ageDays = Math.floor(rnd() * 90) + 1;
     const created = now - ageDays * DAY - Math.floor(rnd() * 10) * 3600e3;
     const lineCount = 1 + Math.floor(rnd() * 3);
     const items = [];
