@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en-IN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Website content (CMS) · Admin</title>
+  <meta name="robots" content="noindex">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/css/tokens.css">
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/store.css">
+  <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body>
+  <div id="admin-shell">
+    <div class="tabs mb-4" role="tablist" id="tabs">
+      <button class="tab" role="tab" data-t="banners" aria-selected="true">Slider banners</button><button class="tab" role="tab" data-t="bento" aria-selected="false">Homepage blocks</button><button class="tab" role="tab" data-t="announcement" aria-selected="false">Announcement bar</button><button class="tab" role="tab" data-t="store" aria-selected="false">Store name & logo</button><button class="tab" role="tab" data-t="pages" aria-selected="false">Static pages</button><button class="tab" role="tab" data-t="footer" aria-selected="false">Footer</button><button class="tab" role="tab" data-t="contact" aria-selected="false">Contact info & FAQ</button>
+    </div>
+    <section class="panel" id="panel" role="tabpanel"></section>
+  </div>
+  <script type="module" src="/admin/js/cms.js"></script>
+</body>
+</html>

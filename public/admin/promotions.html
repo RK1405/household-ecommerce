@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en-IN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Promotions & discounts · Admin</title>
+  <meta name="robots" content="noindex">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/css/tokens.css">
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/store.css">
+  <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body>
+  <div id="admin-shell">
+    <section class="panel"><div class="panel-head"><h2>Promotions & discounts</h2><button class="btn btn-sm" id="new">+ New promotion</button></div>
+      <p class="small muted">Category-wide or product discounts with start/end dates. The best active promotion is applied to each product automatically and shown as a badge; “Deal of the day” promotions appear in the Offers bento tile. Sale prices per product are set on the Products page.</p>
+      <div class="table-wrap"><table class="table"><thead><tr><th>Name</th><th>Applies to</th><th>Discount</th><th>Badge</th><th>Schedule</th><th>State</th><th></th></tr></thead><tbody id="rows"></tbody></table></div></section>
+  </div>
+  <script type="module" src="/admin/js/promotions.js"></script>
+</body>
+</html>

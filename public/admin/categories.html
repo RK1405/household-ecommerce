@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en-IN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Categories · Admin</title>
+  <meta name="robots" content="noindex">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/css/tokens.css">
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/store.css">
+  <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body>
+  <div id="admin-shell">
+    <section class="panel"><div class="panel-head"><h2>Categories & subcategories</h2><button class="btn btn-sm" id="new">+ Add category</button></div>
+      <p class="small muted">Slugs are fixed after creation because product URLs and filters use them. Deleting is blocked while products use a category.</p>
+      <div class="table-wrap"><table class="table"><thead><tr><th>Name</th><th>Slug</th><th>Parent</th><th class="num">Products</th><th class="num">Order</th><th>Status</th><th></th></tr></thead><tbody id="rows"></tbody></table></div></section>
+  </div>
+  <script type="module" src="/admin/js/categories.js"></script>
+</body>
+</html>

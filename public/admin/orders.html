@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en-IN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Orders · Admin</title>
+  <meta name="robots" content="noindex">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/css/tokens.css">
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/store.css">
+  <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body>
+  <div id="admin-shell">
+    <section class="panel">
+      <div class="panel-head"><h2>Orders</h2><a class="btn btn-sm btn-light" id="export" href="/api/admin/orders/export.csv">⬇️ Export CSV</a></div>
+      <div class="filters-bar"><input type="search" class="input" id="q" placeholder="Order no., customer, phone, city" aria-label="Search orders"><select class="input" id="status" aria-label="Status"><option value="">All statuses</option></select><select class="input" id="payment" aria-label="Payment method"><option value="">All payments</option><option value="COD">COD</option><option value="ONLINE">Online</option></select><label class="small muted">From <input type="date" class="input" id="from"></label><label class="small muted">To <input type="date" class="input" id="to"></label><span class="small muted" id="count"></span></div>
+      <div class="table-wrap"><table class="table"><thead><tr><th>Order</th><th>Date</th><th>Customer</th><th>City</th><th class="num">Items</th><th>Payment</th><th>Status</th><th class="num">Total</th><th></th></tr></thead><tbody id="rows"></tbody></table></div>
+      <nav class="pagination" id="pager" aria-label="Pagination"></nav>
+    </section>
+  </div>
+  <script type="module" src="/admin/js/orders.js"></script>
+</body>
+</html>

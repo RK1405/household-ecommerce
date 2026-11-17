@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en-IN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Products · Admin</title>
+  <meta name="robots" content="noindex">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/css/tokens.css">
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/store.css">
+  <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body>
+  <div id="admin-shell">
+    <section class="panel">
+      <div class="panel-head"><h2>Product catalogue</h2><div class="row"><a class="btn btn-sm btn-light" href="/api/admin/products/export.csv" download>⬇️ Export CSV</a><label class="btn btn-sm btn-light" style="cursor:pointer">⬆️ Import CSV<input type="file" accept=".csv,text/csv" hidden id="import"></label><button class="btn btn-sm" id="new">+ Add product</button></div></div>
+      <div class="filters-bar"><input type="search" class="input" id="q" placeholder="Search name, SKU, brand" aria-label="Search products"><select class="input" id="cat" aria-label="Category"><option value="">All categories</option></select><select class="input" id="stock" aria-label="Stock"><option value="">All stock</option><option value="low">Low stock</option><option value="out">Out of stock</option></select><select class="input" id="status" aria-label="Status"><option value="">Any status</option><option value="active">Active</option><option value="inactive">Hidden</option></select><span class="small muted" id="count"></span></div>
+      <div id="import-result"></div>
+      <div class="table-wrap"><table class="table"><thead><tr><th></th><th>Product</th><th>Category</th><th class="num">MRP</th><th class="num">Price</th><th class="num">Effective</th><th>Stock</th><th>Tags</th><th>Status</th><th></th></tr></thead><tbody id="rows"></tbody></table></div>
+    </section>
+  </div>
+  <script type="module" src="/admin/js/products.js"></script>
+</body>
+</html>

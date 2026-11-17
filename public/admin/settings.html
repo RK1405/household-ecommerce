@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en-IN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Store settings · Admin</title>
+  <meta name="robots" content="noindex">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/css/tokens.css">
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/store.css">
+  <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body>
+  <div id="admin-shell">
+    <form id="f" class="a-grid half">
+      <section class="panel"><h2>Delivery charges</h2>
+        <div class="form-grid cols-2"><div class="field"><label for="sc">Standard charge (₹)</label><input class="input" id="sc" name="std_charge" type="number" min="0"></div><div class="field"><label for="sf">Standard free above (₹)</label><input class="input" id="sf" name="std_free" type="number" min="0"></div>
+        <div class="field span-2"><label for="se">Standard delivery time</label><input class="input" id="se" name="std_eta"></div>
+        <div class="field"><label for="ec">Express charge (₹)</label><input class="input" id="ec" name="exp_charge" type="number" min="0"></div><div class="field"><label for="ef">Express free above (₹, blank = never)</label><input class="input" id="ef" name="exp_free" type="number" min="0"></div>
+        <div class="field span-2"><label for="ee">Express delivery time</label><input class="input" id="ee" name="exp_eta"></div></div></section>
+      <section class="panel"><h2>Cash on Delivery rules</h2>
+        <label class="check"><input type="checkbox" name="cod_enabled" id="ce"> Offer Cash on Delivery</label>
+        <div class="form-grid cols-2 mt-4"><div class="field"><label for="cmax">Maximum COD order value (₹)</label><input class="input" id="cmax" name="cod_max" type="number" min="1"></div><div class="field"><label for="cmin">Minimum COD order value (₹)</label><input class="input" id="cmin" name="cod_min" type="number" min="0"></div></div>
+        <h2 class="mt-4">Inventory</h2><div class="field"><label for="ls">Default low-stock threshold</label><input class="input" id="ls" name="low" type="number" min="0"></div></section>
+      <section class="panel"><h2>GST & invoice</h2><p class="small muted">Prices are stored and displayed GST-inclusive.</p>
+        <div class="field"><label for="ln">Legal entity name</label><input class="input" id="ln" name="legalName"></div><div class="field"><label for="gs">GSTIN</label><input class="input" id="gs" name="gstin" maxlength="15" style="text-transform:uppercase"></div>
+        <div class="field"><label for="st">State of registration</label><select class="input" id="st" name="state"></select></div><div class="field"><label for="ip">Invoice number prefix</label><input class="input" id="ip" name="invoicePrefix"></div></section>
+      <section class="panel"><h2>Environment (read-only)</h2><dl class="kv" id="env"></dl><p class="small muted mt-4">These come from <span class="code">.env</span> — see the README for Razorpay, MySQL, Salesforce, SMTP and Google Maps setup.</p>
+        <button class="btn btn-lg mt-4">Save settings</button></section>
+    </form>
+  </div>
+  <script type="module" src="/admin/js/settings.js"></script>
+</body>
+</html>

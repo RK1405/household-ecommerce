@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en-IN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dashboard · Admin</title>
+  <meta name="robots" content="noindex">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/css/tokens.css">
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/store.css">
+  <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body>
+  <div id="admin-shell">
+    <div class="row between mb-4"><p class="muted mb-0">Store performance at a glance</p><select class="input" id="range" style="width:auto;min-height:38px"><option value="7">Last 7 days</option><option value="30" selected>Last 30 days</option><option value="90">Last 90 days</option></select></div>
+    <section class="kpis" id="kpis" aria-label="Key metrics"></section>
+    <div class="a-grid two mt-4">
+      <section class="panel"><div class="panel-head"><h2>Sales trend</h2><a class="small" href="/admin/reports.html">Full reports →</a></div><div class="chart-box"><canvas id="sales-chart" aria-label="Revenue per day chart" role="img"></canvas></div></section>
+      <section class="panel"><h2>Top products</h2><ul class="list-plain" id="top"></ul></section>
+    </div>
+    <div class="a-grid two mt-4">
+      <section class="panel"><div class="panel-head"><h2>Recent orders</h2><a class="small" href="/admin/orders.html">All orders →</a></div><div class="table-wrap"><table class="table"><thead><tr><th>Order</th><th>Customer</th><th>Date</th><th>Payment</th><th>Status</th><th class="num">Total</th></tr></thead><tbody id="recent"></tbody></table></div></section>
+      <section class="panel"><div class="panel-head"><h2>Low stock</h2><a class="small" href="/admin/products.html?stock=low">Manage →</a></div><ul class="list-plain" id="low"></ul></section>
+    </div>
+  </div>
+  <script type="module" src="/admin/js/dashboard.js"></script>
+</body>
+</html>

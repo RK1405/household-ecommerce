@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en-IN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Coupons · Admin</title>
+  <meta name="robots" content="noindex">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/css/tokens.css">
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/store.css">
+  <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body>
+  <div id="admin-shell">
+    <section class="panel"><div class="panel-head"><h2>Coupons</h2><button class="btn btn-sm" id="new">+ New coupon</button></div>
+      <p class="small muted">Coupons are applied in the cart and at checkout. The coupon marked “Highlight” appears in the home page bento tile.</p>
+      <div class="table-wrap"><table class="table"><thead><tr><th>Code</th><th>Discount</th><th>Conditions</th><th>Validity</th><th class="num">Used</th><th>Status</th><th></th></tr></thead><tbody id="rows"></tbody></table></div></section>
+  </div>
+  <script type="module" src="/admin/js/coupons.js"></script>
+</body>
+</html>

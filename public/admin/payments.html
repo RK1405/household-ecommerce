@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en-IN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Payments · Admin</title>
+  <meta name="robots" content="noindex">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/css/tokens.css">
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/store.css">
+  <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body>
+  <div id="admin-shell">
+    <section class="kpis" id="recon"></section>
+    <section class="panel mt-4" id="mismatch-panel" hidden><h2>Reconciliation exceptions</h2><ul class="list-plain" id="mismatch"></ul></section>
+    <section class="panel mt-4"><div class="panel-head"><h2>Transactions</h2><span class="small muted">Provider: <span class="code" id="prov"></span></span></div>
+      <div class="filters-bar"><input type="search" class="input" id="q" placeholder="Payment ID, order no., UPI ID" aria-label="Search payments"><select class="input" id="st" aria-label="Status"><option value="">All statuses</option><option>created</option><option>authorised</option><option>captured</option><option>failed</option><option>refunded</option></select><select class="input" id="md" aria-label="Method"><option value="">All methods</option><option>UPI</option><option>CARD</option></select><label class="small">From <input type="date" class="input" id="from"></label><label class="small">To <input type="date" class="input" id="to"></label></div>
+      <div class="table-wrap"><table class="table"><thead><tr><th>Payment ID</th><th>Order</th><th>Date</th><th>Method</th><th class="num">Amount</th><th>Status</th><th></th></tr></thead><tbody id="rows"></tbody></table></div></section>
+  </div>
+  <script type="module" src="/admin/js/payments.js"></script>
+</body>
+</html>
