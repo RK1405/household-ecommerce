@@ -39,7 +39,7 @@ main { min-height: 60vh; }
 .mobile-only { display: inline-grid; }
 .desktop-only { display: none !important; }
 @media (max-width: 899px) {
-  .header-row { flex-wrap: wrap; height: auto; padding: 8px 0; row-gap: 8px; }
+  .header-row { flex-wrap: wrap; height: auto; padding-top: 8px; padding-bottom: 8px; row-gap: 8px; }
   .search { order: 5; flex-basis: 100%; max-width: none; }
   .brand { flex: 1; }
 }
