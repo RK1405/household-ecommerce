@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en-IN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Product | {store}</title>
+  <!--OG_TAGS-->
+  <meta name="theme-color" content="#0f766e">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/css/tokens.css">
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/store.css">
+</head>
+<body>
+  <div id="site-header"></div>
+  <main id="main" tabindex="-1">
+    <div class="container">
+      <nav class="crumbs" aria-label="Breadcrumb"><ol id="crumbs"><li><a href="/">Home</a></li></ol></nav>
+      <div id="pdp"><div class="pdp"><div class="skeleton" style="aspect-ratio:1"></div><div><div class="skeleton" style="height:36px"></div><div class="skeleton mt-4" style="height:220px"></div></div></div></div>
+      <section class="section" id="details-section" hidden>
+        <div class="tabs" role="tablist" aria-label="Product information">
+          <button class="tab" role="tab" aria-selected="true" aria-controls="tab-desc" id="t-desc">Description</button>
+          <button class="tab" role="tab" aria-selected="false" aria-controls="tab-specs" id="t-specs">Specifications</button>
+          <button class="tab" role="tab" aria-selected="false" aria-controls="reviews" id="t-rev">Reviews</button>
+        </div>
+        <div class="card card-pad" style="border-top-left-radius:0;border-top-right-radius:0">
+          <div id="tab-desc" role="tabpanel" aria-labelledby="t-desc"></div>
+          <div id="tab-specs" role="tabpanel" aria-labelledby="t-specs" hidden></div>
+          <div id="reviews" role="tabpanel" aria-labelledby="t-rev" hidden></div>
+        </div>
+      </section>
+      <section class="section" aria-labelledby="rel-title"><h2 id="rel-title">You may also like</h2><div class="product-grid cols-4" id="related"></div></section>
+    </div>
+    <div class="sticky-buy" id="sticky-buy" aria-hidden="true"></div>
+  </main>
+  <div id="site-footer"></div>
+  <script type="module" src="/js/pages/product.js"></script>
+</body>
+</html>

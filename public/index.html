@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en-IN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>{store} — Household essentials delivered across India</title>
+  <meta name="description" content="Shop kitchen, décor, bath, bedroom, cleaning, storage and small appliances online. GST-inclusive prices, Cash on Delivery and free delivery above ₹999.">
+  <meta name="theme-color" content="#0f766e">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/css/tokens.css">
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/store.css">
+</head>
+<body>
+  <div id="site-header"></div>
+  <main id="main" tabindex="-1">
+    <div class="container">
+      <section class="section" style="padding-top:var(--sp-4)" aria-label="Featured offers">
+        <div class="hero" id="hero" aria-roledescription="carousel"><div class="skeleton" style="aspect-ratio:5/2"></div></div>
+      </section>
+      <section class="usps" aria-label="Why shop with us">
+        <div class="usp"><span class="ic" aria-hidden="true">🚚</span><span><b>Free delivery</b><span class="muted">on orders ₹999+</span></span></div>
+        <div class="usp"><span class="ic" aria-hidden="true">💵</span><span><b>Cash on Delivery</b><span class="muted">up to ₹10,000</span></span></div>
+        <div class="usp"><span class="ic" aria-hidden="true">↩️</span><span><b>7-day returns</b><span class="muted">no questions asked</span></span></div>
+        <div class="usp"><span class="ic" aria-hidden="true">🧾</span><span><b>GST invoice</b><span class="muted">on every order</span></span></div>
+      </section>
+      <section class="section" aria-labelledby="bento-title">
+        <div class="section-head"><div><span class="eyebrow">Handpicked for your ghar</span><h2 id="bento-title">This week at the haat</h2></div><a class="btn btn-outline btn-sm" href="/products.html">Shop all</a></div>
+        <div class="bento" id="bento"><div class="skeleton" style="height:320px"></div><div class="skeleton" style="height:320px"></div></div>
+      </section>
+      <section class="section" aria-labelledby="trend-title">
+        <div class="section-head"><div><span class="eyebrow">Top rated</span><h2 id="trend-title">Trending now</h2></div><a class="link-btn" href="/products.html?sort=rating">View all →</a></div>
+        <div class="product-grid cols-4" id="trending"></div>
+      </section>
+    </div>
+  </main>
+  <div id="site-footer"></div>
+  <script type="module" src="/js/pages/home.js"></script>
+</body>
+</html>

@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en-IN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Shop household products | {store}</title>
+  <meta name="description" content="Browse household items by category with filters for price, rating, stock and offers.">
+  <meta name="theme-color" content="#0f766e">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/css/tokens.css">
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/store.css">
+</head>
+<body>
+  <div id="site-header"></div>
+  <main id="main" tabindex="-1">
+    <div class="container">
+      <nav class="crumbs" aria-label="Breadcrumb"><ol id="crumbs"><li><a href="/">Home</a></li><li aria-current="page">Shop</li></ol></nav>
+      <div class="row between"><h1 id="list-title" style="font-size:var(--fs-2xl)">All products</h1></div>
+      <div class="listing">
+        <aside class="filters card" id="filters" aria-label="Filters">
+          <div class="drawer-head filters-mobile-head"><h3 class="mb-0">Filters</h3><button class="icon-btn" id="filters-close" aria-label="Close filters">✕</button></div>
+          <form id="filter-form"></form>
+          <div class="filter-foot"><button class="btn btn-light" type="button" id="filters-clear" style="flex:1">Clear</button><button class="btn" type="button" id="filters-apply" style="flex:1">Show results</button></div>
+        </aside>
+        <div class="overlay" id="filters-overlay"></div>
+        <section aria-label="Products">
+          <div class="toolbar">
+            <div class="row"><button class="btn btn-light btn-sm mobile-only" id="filters-open" style="display:inline-flex">☰ Filters</button><span class="small muted" id="result-count" aria-live="polite"></span></div>
+            <div class="row"><label for="sort" class="small muted">Sort by</label><select id="sort" class="input">
+              <option value="relevance">Relevance</option><option value="popular">Popularity</option><option value="price-asc">Price: Low to High</option><option value="price-desc">Price: High to Low</option><option value="newest">Newest first</option><option value="rating">Customer rating</option><option value="discount">Biggest discount</option></select></div>
+          </div>
+          <div class="chips mb-4" id="active-chips"></div>
+          <div class="product-grid" id="grid"></div>
+          <nav class="pagination" id="pagination" aria-label="Pagination"></nav>
+        </section>
+      </div>
+    </div>
+  </main>
+  <div id="site-footer"></div>
+  <script type="module" src="/js/pages/products.js"></script>
+</body>
+</html>

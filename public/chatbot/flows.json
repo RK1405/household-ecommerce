@@ -1,0 +1,102 @@
+{
+  "_comment": "Rule-based chatbot flows for HomeHaat. Edit text, keywords, quick replies and links here. {placeholders} are filled from store settings. Actions: list_categories | search_products | show_offers | track_order (built into js/components/chatbot.js).",
+  "bot": { "name": "Haat Helper", "avatar": "🪔", "subtitle": "Usually replies instantly · not an AI" },
+  "greeting": {
+    "text": "Namaste! 👋 I'm {botName}, the {storeName} assistant.\nI can help you find products, offers, delivery info, track an order and more. What would you like to do?",
+    "quickReplies": ["browse", "find", "offers", "delivery", "track", "returns", "payment", "human"]
+  },
+  "intents": [
+    {
+      "id": "browse", "label": "🛍️ Browse categories",
+      "keywords": ["browse", "category", "categories", "catalog", "catalogue", "shop", "departments", "what do you sell", "products"],
+      "text": "Here are our categories — tap one to start browsing:",
+      "action": "list_categories",
+      "quickReplies": ["find", "offers"]
+    },
+    {
+      "id": "find", "label": "🔎 Find a product",
+      "keywords": ["find", "search", "looking for", "do you have", "want to buy", "need a", "need an", "where can i get"],
+      "text": "Sure! Type the product you're looking for — for example “kadai”, “bedsheet”, “steam iron” or “towel”.",
+      "await": "search"
+    },
+    {
+      "id": "offers", "label": "🔥 Offers & coupons",
+      "keywords": ["offer", "offers", "deal", "deals", "discount", "sale", "cheap", "festive", "diwali", "deepavali"],
+      "text": "Today's best deals 🎉",
+      "action": "show_offers",
+      "links": [{ "label": "See all offers →", "href": "/products.html?offers=1" }],
+      "quickReplies": ["coupon", "browse"]
+    },
+    {
+      "id": "coupon", "label": "🎟️ How to apply a coupon",
+      "keywords": ["coupon", "promo code", "promocode", "voucher", "code", "apply code"],
+      "text": "To apply a coupon:\n1️⃣ Add products to your cart\n2️⃣ Open the Cart (or Checkout)\n3️⃣ Type the code in “Have a coupon?” and tap Apply\nThe discount shows instantly in the price breakdown. Codes to try: {couponCodes}.",
+      "links": [{ "label": "Go to my cart →", "href": "/cart.html" }],
+      "quickReplies": ["offers", "delivery"]
+    },
+    {
+      "id": "delivery", "label": "🚚 Delivery charges & time",
+      "keywords": ["delivery", "shipping", "ship", "deliver", "how long", "when will", "charges", "courier", "express", "pincode", "pin code"],
+      "text": "🚚 Standard delivery: ₹{standardCharge} — FREE on orders of ₹{freeAbove}+ · {standardEta}\n⚡ Express delivery: ₹{expressCharge} · {expressEta} (metro cities)\nWe deliver to all serviceable PIN codes across India.",
+      "links": [{ "label": "Shipping & returns policy →", "href": "/page.html?slug=shipping-returns" }],
+      "quickReplies": ["payment", "track"]
+    },
+    {
+      "id": "payment", "label": "💳 COD vs online payment",
+      "keywords": ["cod", "cash on delivery", "cash", "payment", "pay", "upi", "card", "credit", "debit", "online payment", "gpay", "phonepe", "paytm"],
+      "text": "You can pay two ways:\n💵 Cash on Delivery — available on orders up to ₹{codLimit}. Pay by cash or UPI to the delivery partner.\n💳 Online — UPI or debit/credit card on our secure payment page. Prepaid orders are dispatched first.\nIf an online payment fails, no money is deducted and you can retry or switch to COD.",
+      "quickReplies": ["delivery", "returns"]
+    },
+    {
+      "id": "track", "label": "📦 Track my order",
+      "keywords": ["track", "tracking", "where is my order", "order status", "status", "my order", "awb"],
+      "text": "Please type your order ID — it looks like HH100012 (you'll find it in your confirmation email or My Account → Orders).",
+      "await": "track"
+    },
+    {
+      "id": "returns", "label": "↩️ Returns & refunds",
+      "keywords": ["return", "returns", "refund", "refunds", "exchange", "replace", "replacement", "damaged", "broken", "cancel", "cancellation"],
+      "text": "↩️ Return any unused product within 7 days of delivery.\n💰 Refunds go to your original payment method in 5–7 working days (COD refunds to your bank/UPI).\n❌ You can cancel an order yourself from My Account → Orders until it is packed.\n🔌 Appliances are covered by brand warranty after the return window.",
+      "links": [{ "label": "Read the full policy →", "href": "/page.html?slug=shipping-returns" }, { "label": "My orders →", "href": "/account.html#orders" }],
+      "quickReplies": ["track", "human"]
+    },
+    {
+      "id": "account", "label": "👤 Account, login & addresses",
+      "keywords": ["account", "login", "log in", "sign in", "signup", "sign up", "register", "password", "forgot", "address", "addresses", "profile", "otp"],
+      "text": "👤 Create an account or log in to save addresses and track orders.\n🔑 Forgot your password? Use “Forgot password” on the login page — we'll email a reset link.\n📍 Manage addresses (with a map pin for accurate delivery) under My Account → Addresses.",
+      "links": [{ "label": "Log in →", "href": "/login.html" }, { "label": "Create account →", "href": "/register.html" }, { "label": "My addresses →", "href": "/account.html#addresses" }],
+      "quickReplies": ["track", "human"]
+    },
+    {
+      "id": "human", "label": "🙋 Talk to a human",
+      "keywords": ["human", "agent", "person", "customer care", "support", "help", "contact", "call", "phone", "whatsapp", "email", "complaint", "talk"],
+      "text": "Happy to connect you with our team 🙋\n📞 {phone}\n💬 WhatsApp: tap below\n✉️ {email}\n🕘 {hours}",
+      "links": [{ "label": "💬 Chat on WhatsApp", "href": "https://wa.me/{whatsapp}?text=Hi%20{storeName}%2C%20I%20need%20help" }, { "label": "📞 Call us", "href": "tel:{phoneRaw}" }, { "label": "✉️ Contact form", "href": "/contact.html" }],
+      "quickReplies": ["track", "returns"]
+    },
+    {
+      "id": "thanks", "label": "🙏 Thanks",
+      "keywords": ["thanks", "thank you", "thx", "great", "awesome", "ok", "okay", "bye"],
+      "text": "You're welcome! 😊 Anything else I can help with?",
+      "quickReplies": ["browse", "offers", "track"]
+    },
+    {
+      "id": "hello", "label": "👋 Hello",
+      "keywords": ["hi", "hello", "hey", "namaste", "vanakkam", "hii", "good morning", "good evening"],
+      "text": "Hello! 👋 How can I help you today?",
+      "quickReplies": ["browse", "find", "offers", "track", "human"]
+    }
+  ],
+  "fallback": {
+    "text": "Sorry, I didn't quite get that 🤔 Here's what I can help with:",
+    "quickReplies": ["browse", "find", "offers", "coupon", "delivery", "payment", "track", "returns", "account", "human"]
+  },
+  "messages": {
+    "searching": "Searching the catalogue for “{q}”…",
+    "searchResults": "Here's what I found for “{q}”:",
+    "searchNone": "I couldn't find products for “{q}”. Try another word, or browse categories.",
+    "trackFound": "📦 Order {orderNo}\nStatus: {status}\nPayment: {payment}\nItems: {items} · {deliveryMethod} delivery ({eta})\nLast update: {lastUpdate}{tracking}",
+    "trackNotFound": "I couldn't find order “{q}”. Please check the ID (e.g. HH100012) and try again.",
+    "offersNone": "No special deals right now — check back soon!"
+  }
+}
