@@ -87,8 +87,8 @@ function matchIntent(text) {
 
 async function respond(text) {
   const orderId = /\bhh\s?-?\d{6}\b/i.exec(text);
-  if (awaiting === 'track' || orderId) { awaiting = null; return trackOrder(orderId ? orderId[0].replace(/[\s-]/g, '') : text.trim()); }
   const it = matchIntent(text);
+  if (orderId || (awaiting === 'track' && (!it || it.id === 'track'))) { awaiting = null; return trackOrder(orderId ? orderId[0].replace(/[\s-]/g, '') : text.trim()); }
   if (awaiting === 'search' && (!it || it.id === 'find')) { awaiting = null; return searchProducts(text.replace(/^(find|search|looking for|i want|show me)\s+/i, '')); }
   awaiting = null;
   if (it) return runIntent(it);

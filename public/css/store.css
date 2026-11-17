@@ -374,3 +374,8 @@ body.has-sticky .chat-fab { bottom: calc(var(--bottom-nav-h) + 86px); }
 }
 .site-footer .icon { width: 16px; height: 16px; vertical-align: -3px; margin-right: 4px; }
 .contact-grid .icon { width: 18px; height: 18px; vertical-align: -4px; color: var(--c-primary); }
+@media (max-width: 600px) {
+  .hero-slide img { object-position: 88% center; }
+  .hero-slide::before { background: linear-gradient(90deg, rgba(0, 0, 0, .62), rgba(0, 0, 0, .25) 75%, rgba(0, 0, 0, .1)); }
+  .hero-dots { justify-content: flex-end; padding-right: 14px; }
+}

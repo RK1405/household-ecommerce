@@ -51,7 +51,7 @@ export async function mountMapPicker(el, { lat, lng, onChange }) {
     const L = window.L;
     const map = L.map(box, { scrollWheelZoom: false }).setView([start.lat, start.lng], 15);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '© OpenStreetMap contributors' }).addTo(map);
-    const pinIcon = L.divIcon({ className: '', html: '<div style="font-size:34px;line-height:1;transform:translate(-50%,-100%);filter:drop-shadow(0 2px 2px rgba(0,0,0,.35))">📍</div>', iconSize: [0, 0] });
+    const pinIcon = L.divIcon({ className: 'hh-pin', html: '<div style="font-size:34px;line-height:40px;text-align:center;filter:drop-shadow(0 2px 2px rgba(0,0,0,.35))">📍</div>', iconSize: [34, 40], iconAnchor: [17, 40] });
     const marker = L.marker([start.lat, start.lng], { draggable: true, icon: pinIcon, keyboard: true, title: 'Delivery location' }).addTo(map);
     setPos = (p) => { marker.setLatLng([p.lat, p.lng]); map.panTo([p.lat, p.lng]); report(p); };
     marker.on('dragend', () => { const ll = marker.getLatLng(); report({ lat: ll.lat, lng: ll.lng }); });

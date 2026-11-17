@@ -41,7 +41,7 @@ root.innerHTML = `<section class="card card-pad" aria-labelledby="form-h"><h2 id
     await new Promise((res) => { const sc = document.createElement('script'); sc.src = '/vendor/leaflet/leaflet.js'; sc.onload = res; document.head.appendChild(sc); });
     const map = window.L.map(el, { scrollWheelZoom: false }).setView([c.lat, c.lng], 15);
     window.L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap contributors' }).addTo(map);
-    window.L.marker([c.lat, c.lng], { icon: window.L.divIcon({ className: '', html: '<div style="font-size:32px;transform:translate(-50%,-100%)">📍</div>', iconSize: [0, 0] }) }).addTo(map).bindPopup(esc(s.cms.store.name));
+    window.L.marker([c.lat, c.lng], { icon: window.L.divIcon({ className: '', html: '<div style="font-size:32px;line-height:40px;text-align:center">📍</div>', iconSize: [34, 40], iconAnchor: [17, 40] }) }).addTo(map).bindPopup(esc(s.cms.store.name));
   }
 })();
 
