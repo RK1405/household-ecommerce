@@ -148,11 +148,12 @@ Browser (HTML + ES modules)  ──fetch──▶  Express /api  ──▶  rout
 ## 6. Plugging in the real services
 
 ### Razorpay (payments)
-1. `npm install razorpay`
-2. In `.env`: `PAYMENT_PROVIDER=razorpay`, `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`, `RAZORPAY_WEBHOOK_SECRET`.
-3. Finish `src/services/payments/razorpay.provider.js`. The methods (`createOrder`, `verifyPaymentSignature`, `capture`, `refund`, `handleWebhook`) already match the `PaymentProvider` interface, and signature verification is implemented.
-4. On `payment.html`, replace the simulated form with Razorpay Checkout (`checkout.razorpay.com/v1/checkout.js`), passing `key`, `order_id = order.gateway.orderId` and `amount`. In the `handler`, POST `{ razorpay_order_id, razorpay_payment_id, razorpay_signature }` to **`/api/payments/verify`**. That endpoint, and everything after it (capture, order → Placed/paid, emails), is unchanged.
-5. Point a Razorpay webhook to `POST /api/payments/webhook`. Handle `payment.captured`, `payment.failed` and `refund.processed` there to cover users who close the browser.
+Implemented against Razorpay's Orders API + Checkout (test and live keys). `npm run test:razorpay` exercises it against a mock Razorpay server.
+1. In the Razorpay Dashboard (Test Mode) generate API keys. Set `RAZORPAY_KEY_ID` and `RAZORPAY_KEY_SECRET`, then `PAYMENT_PROVIDER=razorpay` (on Render: Environment tab).
+2. Webhook (safety net if the customer closes the browser): Dashboard → Settings → Webhooks → add `https://<your-domain>/api/payments/webhook`, choose your own secret, enable `payment.captured`, `payment.failed` (and `payment.authorized`, `refund.processed`), and set the same secret as `RAZORPAY_WEBHOOK_SECRET`.
+3. Flow: the server creates the Razorpay order at checkout; `payment.html` opens Razorpay Checkout; on success `POST /api/payments/verify` checks the HMAC signature, then confirms amount/order/status with Razorpay and captures if needed before marking the order paid. Cancelling or returning a paid order refunds through Razorpay.
+4. Going live needs Razorpay KYC and swapping the `rzp_test_` keys for live keys.
+Test payments: use Razorpay's test cards/UPI (e.g. card `4111 1111 1111 1111`, any future expiry/CVV, OTP `1234`; UPI `success@razorpay` / `failure@razorpay`), see razorpay.com/docs/payments/payments/test-card-details.
 
 ### MySQL (data)
 1. Create the schema: `mysql -u root -p < db/mysql/schema.sql`, then load demo data: `mysql -u root -p < db/mysql/seed.sql`. Both were validated on MariaDB.
@@ -223,7 +224,7 @@ Set `GOOGLE_MAPS_API_KEY=...` in `.env` and enable the **Maps JavaScript API** f
 ## 9. Known gaps / next steps
 
 1. **Hosting hardening.** The demo runs on Render's free plan (sleeps when idle). Before real customers: a paid always-on instance, a custom domain, and `BASE_URL` set to it. `NODE_ENV=production`, a generated `SESSION_SECRET` and HTTPS are already set by `render.yaml`. Change the seeded admin password (`admin@demo.com`) on any public site.
-2. **Razorpay:** finish `razorpay.provider.js`, add Checkout on `payment.html` and set up webhooks (§6). Add a "switch to COD" option after a failed payment.
+2. **Razorpay:** integrated (§6) and tested against a mock; test against real Razorpay test keys, then complete KYC for live. Add a "switch to COD" option after a failed payment.
 3. **Relational MySQL tables:** MySQL mode (§12) stores records as JSON documents in `hh_documents`. The normalised schema in `db/mysql/` is ready but not wired in; moving to it means writing per-entity repositories. The Reviews/Customers MySQL/Salesforce adapters are still TODO.
 4. **Google Maps:** test with a real key. Optionally add Places autocomplete and reverse geocoding to pre-fill city, state and PIN from the pin.
 5. **Security hardening for production:** CSRF tokens (SameSite=Lax cookies mitigate most cases today), rate limiting beyond the login limiter, HTML sanitising of CMS page content (currently trusted admin HTML), upload virus scanning, and audit logs for admin actions.

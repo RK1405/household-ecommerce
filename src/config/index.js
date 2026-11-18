@@ -30,6 +30,7 @@ const config = {
     provider: process.env.PAYMENT_PROVIDER || 'dummy',
     razorpayKeyId: process.env.RAZORPAY_KEY_ID || '',
     razorpayKeySecret: process.env.RAZORPAY_KEY_SECRET || '',
+    razorpayApiBase: (process.env.RAZORPAY_API_BASE || 'https://api.razorpay.com/v1').replace(/\/$/, ''),
     razorpayWebhookSecret: process.env.RAZORPAY_WEBHOOK_SECRET || '',
     dummySecret: process.env.DUMMY_GATEWAY_SECRET || 'dummy_gateway_secret',
   },

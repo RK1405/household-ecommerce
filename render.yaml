@@ -16,6 +16,14 @@ services:
         value: mysql
       - key: DEMO_MODE
         value: "true"
+      - key: PAYMENT_PROVIDER   # dummy | razorpay (switch to razorpay after adding the keys below)
+        value: dummy
+      - key: RAZORPAY_KEY_ID
+        sync: false
+      - key: RAZORPAY_KEY_SECRET
+        sync: false
+      - key: RAZORPAY_WEBHOOK_SECRET
+        sync: false
       - key: SHOW_DEMO_LOGINS
         value: "false"
       - key: SESSION_SECRET
