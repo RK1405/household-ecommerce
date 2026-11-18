@@ -203,7 +203,7 @@ Set `GOOGLE_MAPS_API_KEY=...` in `.env` and enable the **Maps JavaScript API** f
 
 ## 8. Decisions & assumptions
 
-* **Where the code lives.** The run could not reach the GitHub repo-attachment tools (`list_repos` / `add_repo` were not available) and the sandbox's GitHub CLI token was invalid. So the code was built as a **local git repository** (`~/household-ecommerce`) and delivered as a zip that keeps the full `.git` history. Nothing was pushed, and no GitHub repo was created or changed. To publish it: create an empty `RK1405/household-ecommerce`, then `git remote add origin … && git push -u origin main`.
+* **Where the code lives.** GitHub repo `RK1405/household-ecommerce`. The first build was made locally and pushed; later work (MySQL mode, Render deploy) was added on top. Hosting is a free Render web service with a free TiDB (MySQL-compatible) database, see §12.
 * **Store name** "HomeHaat" (*haat* = traditional market) is an invented placeholder, set only in CMS data. All brands (Rasoi Pro, Sundaram Steel, Kaveri Home, Aangan, Dhaaga, Nivaas, Tara Lights, SwachhLine, Ghar Craft, Sahaj, Neelam Linen, UrjaTech) are fictional.
 * **Express 5** with CommonJS on the server and native ES modules in the browser. No build step and no frontend framework, as specified.
 * **Session:** a signed JWT in an httpOnly cookie (not express-session), so sessions survive server restarts without a session store. The TTL is set by `SESSION_TTL_HOURS`.
@@ -218,13 +218,13 @@ Set `GOOGLE_MAPS_API_KEY=...` in `.env` and enable the **Maps JavaScript API** f
 * **Chatbot** is deterministic keyword/intent matching (no AI). Order tracking returns only status information (no personal data), keyed by order number.
 * **Reviews and Customers** are intentionally not connected to storage (spec item 22). The *Contact enquiries* list on the Customers page is real data.
 * **PIN-code delivery check** on the product page is a demo estimate (no courier API).
-* **Demo mode** (`DEMO_MODE=true`) shows demo credentials and forces every email into the outbox, whatever the SMTP settings say.
+* **Demo mode** (`DEMO_MODE=true`) forces every email into the outbox, whatever the SMTP settings say. `SHOW_DEMO_LOGINS` (defaults to the `DEMO_MODE` value) controls whether the demo credentials appear on the login pages; `render.yaml` sets it to `false`.
 
 ## 9. Known gaps / next steps
 
-1. **Push to GitHub** (see above) and choose hosting. Set `BASE_URL`, a strong `SESSION_SECRET`, `NODE_ENV=production` (enables `Secure` cookies) and HTTPS.
+1. **Hosting hardening.** The demo runs on Render's free plan (sleeps when idle). Before real customers: a paid always-on instance, a custom domain, and `BASE_URL` set to it. `NODE_ENV=production`, a generated `SESSION_SECRET` and HTTPS are already set by `render.yaml`. Change the seeded admin password (`admin@demo.com`) on any public site.
 2. **Razorpay:** finish `razorpay.provider.js`, add Checkout on `payment.html` and set up webhooks (§6). Add a "switch to COD" option after a failed payment.
-3. **MySQL repositories:** the schema and seed are ready; the repository implementations are not. Same for the Reviews/Customers MySQL/Salesforce adapters.
+3. **Relational MySQL tables:** MySQL mode (§12) stores records as JSON documents in `hh_documents`. The normalised schema in `db/mysql/` is ready but not wired in; moving to it means writing per-entity repositories. The Reviews/Customers MySQL/Salesforce adapters are still TODO.
 4. **Google Maps:** test with a real key. Optionally add Places autocomplete and reverse geocoding to pre-fill city, state and PIN from the pin.
 5. **Security hardening for production:** CSRF tokens (SameSite=Lax cookies mitigate most cases today), rate limiting beyond the login limiter, HTML sanitising of CMS page content (currently trusted admin HTML), upload virus scanning, and audit logs for admin actions.
 6. **Admin roles:** there is one `admin` role. Add granular roles (catalogue manager, support, finance) if needed.
