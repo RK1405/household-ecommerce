@@ -15,7 +15,7 @@ router.get('/config/public', (req, res) => {
   res.json({
     store: cms.store, demoMode: config.demoMode, googleMapsApiKey: config.googleMapsApiKey,
     delivery: s.delivery, cod: s.cod, paymentProvider: config.payments.provider, states: INDIAN_STATES,
-    demoAccounts: config.demoMode ? [{ role: 'Customer', email: 'user@demo.com', password: 'User@123' }, { role: 'Admin', email: 'admin@demo.com', password: 'Admin@123' }] : [],
+    demoAccounts: config.showDemoLogins ? [{ role: 'Customer', email: 'user@demo.com', password: 'User@123' }, { role: 'Admin', email: 'admin@demo.com', password: 'Admin@123' }] : [],
   });
 });
 

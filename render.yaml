@@ -16,6 +16,8 @@ services:
         value: mysql
       - key: DEMO_MODE
         value: "true"
+      - key: SHOW_DEMO_LOGINS
+        value: "false"
       - key: SESSION_SECRET
         generateValue: true
       - key: MYSQL_SSL

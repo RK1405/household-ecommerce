@@ -11,6 +11,8 @@ const config = {
   baseUrl: (process.env.BASE_URL || '').replace(/\/$/, ''),
   env: process.env.NODE_ENV || 'development',
   demoMode: bool(process.env.DEMO_MODE, true),
+  // Show the demo logins on the login pages. Defaults to following DEMO_MODE; set false to hide them while keeping demo mode (emails to outbox, simulated payments).
+  showDemoLogins: bool(process.env.SHOW_DEMO_LOGINS, bool(process.env.DEMO_MODE, true)),
   session: {
     secret: process.env.SESSION_SECRET || 'dev-only-secret-change-me',
     ttlHours: Number(process.env.SESSION_TTL_HOURS || 72),
