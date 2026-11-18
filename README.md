@@ -77,11 +77,12 @@ Every page is its own `.html` file with its own page script in `public/js/pages/
 | `order-confirmation.html` | Confirmation and summary |
 | `login.html` / `register.html` | Login (+ forgot/reset password) and registration |
 | `account.html` | Orders & tracking timeline, saved addresses (map pin), profile, password |
+| `account.html` (Returns) | Customers start a return from My Account → Orders on delivered orders (see §13) |
 | `contact.html` | Contact form, address, phone, email, WhatsApp, map, business hours, FAQ |
 | `page.html?slug=` | CMS pages: `about`, `shipping-returns`, `privacy`, `terms` (and any page you add) |
 | `404.html` | Not-found page |
 
-**Admin** (`public/admin/`, every page protected server-side): `login`, `dashboard`, `products`, `categories`, `orders` (+ printable `invoice.html`), `customers`, `reviews`, `coupons`, `promotions`, `cms`, `reports`, `payments`, `email-settings`, `settings`.
+**Admin** (`public/admin/`, every page protected server-side): `login`, `dashboard`, `products`, `categories`, `orders` (+ printable `invoice.html`), `returns`, `customers`, `reviews`, `coupons`, `promotions`, `cms`, `reports`, `payments`, `email-settings`, `settings`.
 
 ## 4. Folder structure
 
@@ -248,3 +249,15 @@ The latest run: **37/37 passed, 0 console/network issues** — see `docs/test-re
 `DATA_PROVIDER=mysql` stores everything in MySQL instead of `/data` files: records go in table `hh_documents` (one JSON row per record), admin uploads and email HTML in `hh_files`. Tables are created and the demo data is seeded automatically on first start. All data is cached in memory and written through to MySQL, so **run a single app instance**. `npm run reset` wipes and re-seeds the MySQL tables. The relational `db/mysql/schema.sql` is for the later move to normalised tables and is not used by this mode.
 
 Deploy: create a MySQL database (e.g. TiDB Cloud Serverless), then on Render create a Blueprint from this repo (`render.yaml`) and set `MYSQL_URL` and `BASE_URL`. The free Render plan sleeps after ~15 minutes idle.
+
+## 13. Returns & refunds
+
+* **Per-product window.** Admin → Products → *Return window (days after delivery)*, 0–30. **0 = no returns** for that product. Products created before this field existed default to 7 days.
+* **Minimum price rule.** Products sold **below ₹1,000** (the price the customer pays) are never returnable, whatever the admin chose. The threshold is editable in Admin → Store settings → Returns (0 turns the rule off). The window is snapshotted on each order line when the order is placed.
+* **Flow.** Order must be *Delivered* → customer clicks **Return items** on the order card (My Account → Orders), picks items/quantities, a reason, and (COD only) a UPI ID → admin sees it under **Admin → Returns** → *Approve* or *Reject* (reason required) → *Mark items received* (optionally restock) → refund. Statuses: Requested → Approved → Received → Refunded (or Rejected / Cancelled by the customer while Requested).
+* **Who pays shipping:** the store. Pickup is arranged by the admin manually (a courier integration would automate it).
+* **Refunds.** Online orders are refunded automatically through the payment provider (partial refund of the returned items). COD orders: the admin pays the customer's UPI ID from their own UPI app and records the transaction reference. The refund per item is what the customer paid (coupon share included, delivery charge not refunded).
+* **Guard.** Once an order has returns, the old manual "Returned" status is blocked so nothing is refunded twice. When every item has been returned the order becomes *Returned* automatically.
+* **Emails** (outbox in demo mode): return requested (customer + admin), approved, rejected, refunded.
+* **Tests:** `npm run test:returns` (14 checks, runs on JSON or MySQL via `DATA_PROVIDER`).
+* **Not built yet:** photo upload with a return request, exchanges/replacements, courier-booked return pickups, and the relational tables for returns in `db/mysql/schema.sql` (returns are stored as documents in the `returns` collection).

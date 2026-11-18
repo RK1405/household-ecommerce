@@ -287,7 +287,7 @@ async function placeOrder(page, payment) {
       await ask('is cash on delivery available', /Cash on Delivery — available on orders up to ₹10,000/);
       await ask('track my order', /order ID/); await ask('HH100005', /Order HH100005/);
       await ask('track HH999999', /couldn't find/i);
-      await ask('I want to return an item', /7 days/);
+      await ask('I want to return an item', /window shown on each product page/);
       await ask('forgot password', /reset link/);
       await ask('talk to a human', /\+91/);
       await ask('qwertyuiop', /didn't quite get that/);

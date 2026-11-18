@@ -5,6 +5,7 @@ const { requireAuth } = require('../middleware/auth');
 const { HttpError } = require('../middleware/errors');
 const { validateAddress, normPhone, isMobile } = require('../utils/validate');
 const { id } = require('../utils/ids');
+const returns = require('../services/returns.service');
 
 router.use(requireAuth);
 
@@ -64,7 +65,21 @@ router.delete('/addresses/:id', (req, res) => {
   res.json(list);
 });
 
-router.get('/orders', (req, res) => res.json(repo.orders.byUser(req.user.id)));
+router.get('/orders', (req, res) => res.json(repo.orders.byUser(req.user.id).map((o) => ({ ...o, returnInfo: returns.orderReturnInfo(o) }))));
+
+// ----- Returns -----
+router.get('/orders/:id/return-options', (req, res) => {
+  const o = repo.orders.findById(req.params.id);
+  if (!o || o.userId !== req.user.id) throw new HttpError(404, 'Order not found');
+  res.json({ ...returns.eligibility(o), reasons: returns.REASONS, paymentMethod: o.paymentMethod });
+});
+router.get('/returns', (req, res) => res.json(repo.returns.byUser(req.user.id)));
+router.post('/returns', (req, res) => res.status(201).json(returns.create(req.user, req.body || {})));
+router.post('/returns/:id/cancel', (req, res) => {
+  const r = repo.returns.findById(req.params.id);
+  if (!r) throw new HttpError(404, 'Return not found');
+  res.json(returns.cancel(req.user, r));
+});
 router.get('/orders/:id', (req, res) => {
   const o = repo.orders.findById(req.params.id);
   if (!o || o.userId !== req.user.id) throw new HttpError(404, 'Order not found');

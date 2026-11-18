@@ -58,6 +58,7 @@ function preview(type) {
     order: sampleOrder,
     payment: { id: 'pay_sample123', amount: sampleOrder?.totals.total || 1999, method: 'UPI', failureReason: 'Declined by bank (demo)' },
     refund: { id: 'rfnd_sample', amount: sampleOrder?.totals.total || 1999 },
+    ret: { returnNo: 'RT1001', paymentMethod: 'COD', upiId: 'priya@okaxis', reason: 'Damaged or defective', comment: '', adminNote: 'Pickup within 2 days', refundAmount: 1299, refund: { id: 'UPI123456' }, items: (sampleOrder?.items || []).slice(0, 1).map((i) => ({ name: i.name, qty: 1, lineRefund: 1299 })) },
     contact: { name: 'Arjun', email: 'arjun@example.com', phone: '9876543210', topic: 'Order help', message: 'Where is my order?' },
   };
   return templates.render(type, sample, { store, baseUrl: baseUrl() });

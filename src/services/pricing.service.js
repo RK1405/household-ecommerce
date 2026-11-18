@@ -1,4 +1,5 @@
 'use strict';
+const returnPolicy = require('../utils/returnPolicy');
 /**
  * Pricing rules (all prices are GST-inclusive, in ₹):
  *   base price  = product.salePrice (if inside its sale window) else product.price
@@ -52,7 +53,7 @@ function priceProduct(p, promos = activePromotions()) {
 function view(p, promos) {
   const pricing = priceProduct(p, promos);
   const { illustration, ...rest } = p;
-  return { ...rest, pricing, price: pricing.finalPrice, inStock: p.stock > 0, lowStock: p.stock > 0 && p.stock <= (p.lowStockThreshold || 5) };
+  return { ...rest, pricing, price: pricing.finalPrice, returnPolicy: returnPolicy.describe(pricing.finalPrice, p, repo.settings.get()), inStock: p.stock > 0, lowStock: p.stock > 0 && p.stock <= (p.lowStockThreshold || 5) };
 }
 
 function deliveryCharge(method, amountAfterDiscount, settings) {
@@ -109,7 +110,7 @@ function quote(items, { couponCode, user, deliveryMethod = 'standard', paymentMe
     else if (qty > p.stock) issues.push({ productId: p.id, message: `Only ${p.stock} left of ${p.name}.` });
     lines.push({
       productId: p.id, name: p.name, slug: p.slug, sku: p.sku, brand: p.brand, image: p.images[0], category: p.category, subcategory: p.subcategory,
-      mrp: p.mrp, price: pr.finalPrice, qty, stock: p.stock, gstRate: p.gstRate, hsn: p.hsn, lineTotal: pr.finalPrice * qty, lineMrp: p.mrp * qty, badges: pr.badges,
+      mrp: p.mrp, price: pr.finalPrice, returnWindowDays: returnPolicy.effectiveWindow(pr.finalPrice, returnPolicy.adminWindow(p), returnPolicy.minPriceOf(repo.settings.get())), qty, stock: p.stock, gstRate: p.gstRate, hsn: p.hsn, lineTotal: pr.finalPrice * qty, lineMrp: p.mrp * qty, badges: pr.badges,
     });
   }
   const subtotal = lines.reduce((a, l) => a + l.lineTotal, 0);

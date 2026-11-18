@@ -22,7 +22,8 @@
       <section class="panel"><h2>Cash on Delivery rules</h2>
         <label class="check"><input type="checkbox" name="cod_enabled" id="ce"> Offer Cash on Delivery</label>
         <div class="form-grid cols-2 mt-4"><div class="field"><label for="cmax">Maximum COD order value (₹)</label><input class="input" id="cmax" name="cod_max" type="number" min="1"></div><div class="field"><label for="cmin">Minimum COD order value (₹)</label><input class="input" id="cmin" name="cod_min" type="number" min="0"></div></div>
-        <h2 class="mt-4">Inventory</h2><div class="field"><label for="ls">Default low-stock threshold</label><input class="input" id="ls" name="low" type="number" min="0"></div></section>
+        <h2 class="mt-4">Inventory</h2><div class="field"><label for="ls">Default low-stock threshold</label><input class="input" id="ls" name="low" type="number" min="0"></div>
+        <h2 class="mt-4">Returns</h2><div class="field"><label for="rm">No returns on products priced below (₹)</label><input class="input" id="rm" name="returnMin" type="number" min="0"><span class="field-hint xs muted">Applies to the price the customer pays, regardless of the per-product return window. Set 0 to turn this rule off.</span></div></section>
       <section class="panel"><h2>GST & invoice</h2><p class="small muted">Prices are stored and displayed GST-inclusive.</p>
         <div class="field"><label for="ln">Legal entity name</label><input class="input" id="ln" name="legalName"></div><div class="field"><label for="gs">GSTIN</label><input class="input" id="gs" name="gstin" maxlength="15" style="text-transform:uppercase"></div>
         <div class="field"><label for="st">State of registration</label><select class="input" id="st" name="state"></select></div><div class="field"><label for="ip">Invoice number prefix</label><input class="input" id="ip" name="invoicePrefix"></div></section>

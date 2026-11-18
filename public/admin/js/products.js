@@ -31,7 +31,7 @@ function form(p) {
   const subOpts = (catSlug) => cats.filter((c) => c.parentId === `cat_${catSlug}` || cats.find((x) => x.id === c.parentId)?.slug === catSlug).map((c) => [c.slug, c.name]);
   const f = openForm({
     title: p ? `Edit: ${p.name}` : 'Add product',
-    values: p ? { ...p, highlights: (p.highlights || []).join('\n'), tags: p.tags } : { gstRate: 18, stock: 10, active: true, category: top[0].slug, images: [] },
+    values: p ? { ...p, highlights: (p.highlights || []).join('\n'), tags: p.tags } : { gstRate: 18, stock: 10, returnWindowDays: 7, active: true, category: top[0].slug, images: [] },
     fields: [
       { name: 'name', label: 'Product name', required: true, span: true },
       { name: 'sku', label: 'SKU', required: true, hint: 'Unique, e.g. HH-KIT-COO-051' },
@@ -48,6 +48,7 @@ function form(p) {
       { name: 'saleEnd', label: 'Sale ends', type: 'datetime' },
       { name: 'stock', label: 'Stock', type: 'number', min: 0 },
       { name: 'lowStockThreshold', label: 'Low-stock alert at', type: 'number', min: 0 },
+      { name: 'returnWindowDays', label: 'Return window (days after delivery)', type: 'number', min: 0, max: 30, hint: '0 = no returns for this product. Products sold below the minimum return price (Store settings, default ₹1,000) are never returnable, whatever you enter here.' },
       { name: 'rating', label: 'Rating (placeholder)', type: 'number', step: '0.1', min: 0 },
       { name: 'ratingCount', label: 'Rating count (placeholder)', type: 'number', min: 0 },
       { name: 'tags', label: 'Tags', type: 'checks', options: [['new-arrival', 'New arrival'], ['on-offer', 'On offer'], ['best-seller', 'Best seller']] },

@@ -6,6 +6,7 @@ const multer = require('multer');
 const repo = require('../../repositories');
 const config = require('../../config');
 const pricing = require('../../services/pricing.service');
+const returnPolicy = require('../../utils/returnPolicy');
 const { HttpError } = require('../../middleware/errors');
 const { id, slugify } = require('../../utils/ids');
 const { toCsv, parseCsv } = require('../../utils/csv');
@@ -37,6 +38,7 @@ function normalise(b, existing = {}) {
     gstRate: num(b.gstRate, existing.gstRate ?? 18), hsn: String(b.hsn ?? existing.hsn ?? ''),
     stock: Math.max(0, Math.floor(num(b.stock, existing.stock ?? 0))),
     lowStockThreshold: num(b.lowStockThreshold, existing.lowStockThreshold ?? 5),
+    returnWindowDays: Math.floor(num(b.returnWindowDays, existing.returnWindowDays ?? returnPolicy.DEFAULT_WINDOW_DAYS)),
     rating: num(b.rating, existing.rating ?? 0), ratingCount: num(b.ratingCount, existing.ratingCount ?? 0),
     tags: b.tags !== undefined ? list(b.tags).filter((t) => TAGS.includes(t)) : existing.tags || [],
     featured: b.featured !== undefined ? b.featured === true || b.featured === 'true' || b.featured === '1' : !!existing.featured,
@@ -52,6 +54,7 @@ function normalise(b, existing = {}) {
   if (!(p.mrp > 0)) errors.mrp = 'MRP must be > 0';
   if (!(p.price > 0) || p.price > p.mrp) errors.price = 'Selling price must be > 0 and ≤ MRP';
   if (p.salePrice != null && !(p.salePrice > 0 && p.salePrice <= p.price)) errors.salePrice = 'Sale price must be ≤ selling price';
+  if (!(p.returnWindowDays >= 0 && p.returnWindowDays <= returnPolicy.MAX_WINDOW_DAYS)) errors.returnWindowDays = `Return window must be 0 (no returns) to ${returnPolicy.MAX_WINDOW_DAYS} days`;
   if (![0, 5, 12, 18, 28].includes(p.gstRate)) errors.gstRate = 'GST must be 0, 5, 12, 18 or 28';
   return { p, errors };
 }
@@ -75,7 +78,7 @@ router.get('/products', (req, res) => {
 });
 
 router.get('/products/export.csv', (req, res) => {
-  const cols = ['sku', 'name', 'slug', 'brand', 'category', 'subcategory', 'mrp', 'price', 'salePrice', 'gstRate', 'hsn', 'stock', 'rating', 'tags', 'featured', 'active', 'images', 'highlights', 'description'];
+  const cols = ['sku', 'name', 'slug', 'brand', 'category', 'subcategory', 'mrp', 'price', 'salePrice', 'gstRate', 'hsn', 'stock', 'returnWindowDays', 'rating', 'tags', 'featured', 'active', 'images', 'highlights', 'description'];
   res.setHeader('Content-Type', 'text/csv; charset=utf-8');
   res.setHeader('Content-Disposition', `attachment; filename="products-${new Date().toISOString().slice(0, 10)}.csv"`);
   res.send('﻿' + toCsv(repo.products.all(), cols));

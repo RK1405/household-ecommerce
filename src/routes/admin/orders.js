@@ -32,7 +32,7 @@ router.get('/orders/export.csv', (req, res) => {
 router.get('/orders/:id', (req, res) => {
   const o = repo.orders.findById(req.params.id);
   if (!o) throw new HttpError(404, 'Order not found');
-  res.json({ ...o, payments: repo.payments.byOrder(o.id), allowedNext: orders.allowedNext(o.status), emails: repo.emails.all().filter((e) => e.orderNo === o.orderNo) });
+  res.json({ ...o, returns: repo.returns.byOrder(o.id), payments: repo.payments.byOrder(o.id), allowedNext: orders.allowedNext(o.status), emails: repo.emails.all().filter((e) => e.orderNo === o.orderNo) });
 });
 
 router.post('/orders/:id/status', (req, res) => {

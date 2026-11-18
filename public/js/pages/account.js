@@ -12,6 +12,42 @@ document.getElementById('hello').textContent = `Namaste, ${s.user.name.split(' '
 if (new URLSearchParams(location.search).get('welcome')) toast('Welcome! Your account is ready. Check your email (outbox) for a welcome offer.', { type: 'success', timeout: 6000 });
 const FLOW = ['Placed', 'Confirmed', 'Packed', 'Shipped', 'Out for delivery', 'Delivered'];
 
+const RET_TONE = { Requested: 'info', Approved: 'success', Received: 'warning', Refunded: 'muted', Rejected: 'danger', Cancelled: 'muted' };
+function returnBlock(o) {
+  const ri = o.returnInfo || { requests: [] };
+  const reqs = ri.requests.map((r) => `<div class="mt-4"><strong>Return ${esc(r.returnNo)}</strong> <span class="badge badge-${RET_TONE[r.status] || 'muted'}">${esc(r.status)}</span> <span class="xs muted">${inr(r.refundAmount)} · ${esc(r.items.join(', '))}</span>${r.adminNote ? `<br><span class="xs">Note from us: ${esc(r.adminNote)}</span>` : ''}${r.status === 'Requested' ? ` <button class="btn btn-sm btn-light" data-cancel-return="${r.id}">Cancel request</button>` : ''}</div>`).join('');
+  if (o.status !== 'Delivered' && !ri.requests.length) return '';
+  const action = ri.canReturn ? `<div class="mt-4"><button class="btn btn-sm" data-return="${o.id}">↩️ Return items</button> <span class="xs muted">${ri.returnBy ? `Return by ${date(ri.returnBy)} · ` : ''}pickup is free</span></div>` : (o.status === 'Delivered' && ri.message ? `<p class="xs muted mt-4">↩️ ${esc(ri.message)}</p>` : '');
+  return `<div class="mt-4" style="border-top:1px solid var(--c-border);padding-top:8px"><strong class="small">Returns</strong>${reqs}${action}</div>`;
+}
+
+async function openReturn(orderId) {
+  const opt = await get(`/api/account/orders/${encodeURIComponent(orderId)}/return-options`);
+  const overlay = document.createElement('div'); overlay.className = 'overlay open';
+  const m = document.createElement('div'); m.className = 'modal modal-sm open'; m.setAttribute('role', 'dialog'); m.setAttribute('aria-modal', 'true'); m.setAttribute('aria-label', 'Return items');
+  const close = () => { m.remove(); overlay.remove(); document.body.classList.remove('no-scroll'); };
+  m.innerHTML = `<div class="modal-head"><strong>Return items</strong><button class="icon-btn" type="button" data-x aria-label="Close">✕</button></div><div class="modal-body"><form id="return-form" novalidate>
+    <p class="small muted">Choose what you want to send back. Pickup is free — we arrange it once your return is approved.</p>
+    ${opt.items.map((i) => `<div class="field" style="border:1px solid var(--c-border);border-radius:10px;padding:10px;${i.returnable ? '' : 'opacity:.65'}"><label class="row" style="gap:10px;align-items:center"><input type="checkbox" name="pick" value="${esc(i.productId)}" ${i.returnable ? '' : 'disabled'}><img src="${esc(i.image)}" alt="" style="width:44px;height:44px;border-radius:8px"><span class="small"><strong>${esc(i.name)}</strong><br>${i.returnable ? `Refund ${inr(i.unitPaid)} each · return by ${date(i.deadline)}` : esc(i.reason)}</span></label>${i.returnable && i.remaining > 1 ? `<label class="xs">Quantity <select class="input" data-qty="${esc(i.productId)}" style="width:auto;display:inline-block">${Array.from({ length: i.remaining }, (_, k) => `<option>${k + 1}</option>`).join('')}</select> of ${i.remaining}</label>` : ''}</div>`).join('')}
+    <div class="field"><label for="r-reason">Reason</label><select class="input" id="r-reason" name="reason"><option value="">Choose a reason</option>${opt.reasons.map((r) => `<option>${esc(r)}</option>`).join('')}</select></div>
+    <div class="field"><label for="r-comment">Details (optional)</label><textarea class="input" id="r-comment" name="comment" rows="2" maxlength="500"></textarea></div>
+    ${opt.paymentMethod === 'COD' ? `<div class="field"><label for="r-upi">UPI ID for your refund</label><input class="input" id="r-upi" name="upiId" placeholder="yourname@okaxis" autocomplete="off"><span class="xs muted">This was a Cash on Delivery order, so we send your refund to this UPI ID.</span></div>` : '<p class="xs muted">Your refund goes back to the original payment method.</p>'}
+    <div class="alert alert-danger" id="r-err" role="alert" hidden></div>
+    <button class="btn btn-block" id="r-submit">Submit return request</button></form></div>`;
+  document.body.append(overlay, m); document.body.classList.add('no-scroll');
+  overlay.onclick = close; m.querySelector('[data-x]').onclick = close;
+  m.querySelector('#return-form').onsubmit = async (e) => {
+    e.preventDefault();
+    const f = e.target; const err = m.querySelector('#r-err'); err.hidden = true;
+    const items = [...f.querySelectorAll('input[name=pick]:checked')].map((c) => ({ productId: c.value, qty: Number(f.querySelector(`[data-qty="${CSS.escape(c.value)}"]`)?.value || 1) }));
+    const btn = m.querySelector('#r-submit'); btn.disabled = true;
+    try {
+      await post('/api/account/returns', { orderId, items, reason: f.reason.value, comment: f.comment.value, upiId: f.upiId?.value });
+      close(); toast('Return requested — we will email you soon', { type: 'success' }); show('orders');
+    } catch (ex) { err.textContent = ex.message; err.hidden = false; btn.disabled = false; }
+  };
+}
+
 const tabs = {
   async orders() {
     const orders = await get('/api/account/orders');
@@ -21,6 +57,7 @@ const tabs = {
       return `<article class="order-card"><div class="row between"><div><strong>${esc(o.orderNo)}</strong> <span class="small muted">· ${date(o.createdAt)}</span></div><div class="row" style="gap:6px">${statusBadge(o.status)}${statusBadge(o.paymentStatus)}</div></div>
       <div class="row mt-4" style="gap:8px">${o.items.slice(0, 4).map((i) => `<img src="${i.image}" alt="${esc(i.name)}" title="${esc(i.name)}" style="width:52px;height:52px;border-radius:8px">`).join('')}<span class="small muted">${o.items.reduce((a, i) => a + i.qty, 0)} item(s) · <strong style="color:var(--c-text)">${inr(o.totals.total)}</strong> · ${o.paymentMethod === 'COD' ? 'COD' : 'Online'}</span></div>
       ${idx >= 0 ? `<ol class="timeline" aria-label="Order progress">${FLOW.map((st, i) => `<li class="${i <= idx ? 'done' : ''} ${i === idx ? 'current' : ''}">${st}</li>`).join('')}</ol>` : `<p class="small mt-4">${o.status === 'Pending Payment' ? `Payment pending — <a href="/payment.html?order=${o.id}">complete payment</a>` : `This order was ${esc(o.status.toLowerCase())}.`}</p>`}
+      ${returnBlock(o)}
       <details><summary class="small" style="cursor:pointer;font-weight:600">Order details & tracking history</summary><div class="small mt-4">
         ${o.items.map((i) => `<div class="row between"><a href="/product/${i.slug}">${esc(i.name)} × ${i.qty}</a><span>${inr(i.lineTotal)}</span></div>`).join('')}
         <hr class="divider"><p><strong>Deliver to:</strong> ${esc(o.shippingAddress.name)}, ${formatAddress(o.shippingAddress)}</p>
@@ -67,6 +104,8 @@ panel.addEventListener('click', async (e) => {
   if (t.dataset.edit) { const list = await get('/api/account/addresses'); openAddressForm(list.find((a) => a.id === t.dataset.edit), { onSaved: () => { toast('Address updated', { type: 'success' }); show('addresses'); } }); }
   if (t.dataset.del && confirm('Delete this address?')) { await del(`/api/account/addresses/${t.dataset.del}`); toast('Address deleted'); show('addresses'); }
   if (t.dataset.default) { await post(`/api/account/addresses/${t.dataset.default}/default`); show('addresses'); }
+  if (t.dataset.return) { try { await openReturn(t.dataset.return); } catch (err) { toast(err.message, { type: 'error' }); } }
+  if (t.dataset.cancelReturn && confirm('Cancel this return request?')) { try { await post(`/api/account/returns/${t.dataset.cancelReturn}/cancel`); toast('Return request cancelled'); show('orders'); } catch (err) { toast(err.message, { type: 'error' }); } }
   if (t.dataset.cancel && confirm('Cancel this order?')) { try { await post(`/api/account/orders/${t.dataset.cancel}/cancel`); toast('Order cancelled', { type: 'success' }); show('orders'); } catch (err) { toast(err.message, { type: 'error' }); } }
 });
 panel.addEventListener('submit', async (e) => {

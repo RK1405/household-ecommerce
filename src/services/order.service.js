@@ -72,6 +72,7 @@ async function refundOrder(order, reason) {
 
 function changeStatus(order, status, note = '', by = 'admin') {
   if (!ALL_STATUSES.includes(status)) throw new HttpError(400, 'Unknown status');
+  if (status === 'Returned' && require('./returns.service').hasActiveReturns(order.id)) throw new HttpError(400, 'This order has return requests. Process the refund from Admin → Returns instead.');
   if (!allowedNext(order.status).includes(status)) throw new HttpError(400, `Cannot move an order from "${order.status}" to "${status}".`);
   const at = new Date().toISOString();
   const patch = { status, statusHistory: [...order.statusHistory, { status, at, note, by }] };

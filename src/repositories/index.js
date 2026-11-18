@@ -11,6 +11,7 @@ module.exports = {
   carts: require('./carts.repo'),
   orders: require('./orders.repo'),
   payments: require('./payments.repo'),
+  returns: require('./returns.repo'),
   coupons: require('./coupons.repo'),
   promotions: require('./promotions.repo'),
   cms: require('./cms.repo'),

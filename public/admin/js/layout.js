@@ -6,7 +6,7 @@ import { icon } from '/js/lib/icons.js';
 const NAV = [
   ['Overview', [['dashboard', '📊', 'Dashboard'], ['reports', '📈', 'Sales reports']]],
   ['Catalogue', [['products', '📦', 'Products'], ['categories', '🗂️', 'Categories']]],
-  ['Sales', [['orders', '🧾', 'Orders'], ['payments', '💳', 'Payments'], ['customers', '👥', 'Customers'], ['reviews', '⭐', 'Reviews']]],
+  ['Sales', [['orders', '🧾', 'Orders'], ['payments', '💳', 'Payments'], ['returns', '↩️', 'Returns'], ['customers', '👥', 'Customers'], ['reviews', '⭐', 'Reviews']]],
   ['Marketing', [['coupons', '🎟️', 'Coupons'], ['promotions', '🏷️', 'Promotions & discounts'], ['cms', '🖼️', 'Website content (CMS)']]],
   ['Configuration', [['email-settings', '✉️', 'Email settings'], ['settings', '⚙️', 'Store settings']]],
 ];
