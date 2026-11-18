@@ -1,0 +1,26 @@
+# Render Blueprint: free web service + external MySQL (data lives in MySQL, so no disk is needed).
+services:
+  - type: web
+    name: homehaat
+    runtime: node
+    plan: free
+    buildCommand: npm ci
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_VERSION
+        value: 22
+      - key: NODE_ENV
+        value: production
+      - key: DATA_PROVIDER
+        value: mysql
+      - key: DEMO_MODE
+        value: "true"
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: MYSQL_SSL
+        value: "true"
+      - key: MYSQL_URL        # paste your database URL in the Render dashboard
+        sync: false
+      - key: BASE_URL         # e.g. https://homehaat.onrender.com (set after first deploy)
+        sync: false
