@@ -11,8 +11,13 @@ const config = require('./src/config');
 const { writeSeed } = require('./scripts/seed');
 
 // First run: create /data/*.json from the seed generator
-const seeded = writeSeed();
-if (seeded.length) console.log(`[seed] created ${seeded.join(', ')}`);
+const useDb = config.dataProvider === 'mysql';
+if (!useDb) {
+  const seeded = writeSeed();
+  if (seeded.length) console.log(`[seed] created ${seeded.join(', ')}`);
+}
+const mysqlStore = require('./src/db/mysqlStore');
+const files = require('./src/db/files');
 
 const repo = require('./src/repositories');
 const pricing = require('./src/services/pricing.service');
@@ -80,6 +85,16 @@ app.get('/product/:slug', (req, res, next) => {
   res.type('html').send(html);
 });
 
+// ---------- Admin uploads served from MySQL (json provider serves them from disk via static) ----------
+if (useDb) {
+  app.get('/uploads/:name', async (req, res, next) => {
+    const f = await files.get('uploads', req.params.name);
+    if (!f) return next();
+    res.set({ 'Content-Type': f.mime, 'Cache-Control': 'public, max-age=86400', 'Content-Security-Policy': "default-src 'none'; style-src 'unsafe-inline'; sandbox" });
+    res.send(f.data);
+  });
+}
+
 // ---------- Static site ----------
 app.use('/admin', adminPageGuard);
 app.get('/admin', (req, res) => res.redirect('/admin/dashboard.html'));
@@ -91,14 +106,24 @@ app.use((req, res) => {
 });
 app.use(errorHandler);
 
-if (require.main === module) {
+async function start() {
+  if (useDb) {
+    await mysqlStore.init({ buildSeed: require('./scripts/seed').buildSeed });
+    const shutdown = async () => { try { await mysqlStore.close(); } finally { process.exit(0); } };
+    process.on('SIGTERM', shutdown); process.on('SIGINT', shutdown);
+  }
   app.listen(config.port, () => {
     const base = config.baseUrl || `http://localhost:${config.port}`;
     console.log(`\n  ${repo.cms.get().store.name} is running`);
     console.log(`  Storefront : ${base}/`);
     console.log(`  Admin      : ${base}/admin/login.html`);
+    console.log(`  Data store : ${useDb ? 'MySQL' : 'JSON files'}`);
     console.log(`  Demo mode  : ${config.demoMode ? 'ON (emails go to storage/outbox, demo logins shown)' : 'OFF'}\n`);
   });
+}
+
+if (require.main === module) {
+  start().catch((e) => { console.error('Failed to start:', e.message); process.exit(1); });
 }
 
 module.exports = app;
