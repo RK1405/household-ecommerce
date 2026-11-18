@@ -39,6 +39,15 @@ const config = {
     pass: process.env.SMTP_PASS || '',
     from: process.env.MAIL_FROM || 'HomeHaat <no-reply@homehaat.example>',
   },
+  mysql: {
+    url: process.env.MYSQL_URL || '',
+    host: process.env.MYSQL_HOST || 'localhost',
+    port: Number(process.env.MYSQL_PORT || 3306),
+    user: process.env.MYSQL_USER || 'homehaat',
+    password: process.env.MYSQL_PASSWORD || '',
+    database: process.env.MYSQL_DATABASE || 'homehaat',
+    ssl: bool(process.env.MYSQL_SSL, false),
+  },
   adminEmail: process.env.ADMIN_EMAIL || 'admin@demo.com',
   googleMapsApiKey: process.env.GOOGLE_MAPS_API_KEY || '',
 };

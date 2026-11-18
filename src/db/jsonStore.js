@@ -7,6 +7,9 @@
 const fs = require('fs');
 const path = require('path');
 const config = require('../config');
+const mysqlStore = require('./mysqlStore');
+
+const useDb = () => config.dataProvider === 'mysql';
 
 const cache = new Map();
 
@@ -22,6 +25,13 @@ function ensureSeeded(name, fallback) {
 }
 
 function read(name, fallback = []) {
+  if (useDb()) {
+    if (!mysqlStore.isReady()) throw new Error(`Data store not initialised (reading "${name}" before MySQL connected)`);
+    const v = mysqlStore.get(name);
+    if (v !== undefined) return v;
+    mysqlStore.set(name, fallback);
+    return fallback;
+  }
   if (cache.has(name)) return cache.get(name);
   ensureSeeded(name, fallback);
   const data = JSON.parse(fs.readFileSync(file(name), 'utf8'));
@@ -30,6 +40,7 @@ function read(name, fallback = []) {
 }
 
 function write(name, data) {
+  if (useDb()) { mysqlStore.set(name, data); return data; }
   cache.set(name, data);
   const f = file(name);
   const tmp = `${f}.${process.pid}.tmp`;

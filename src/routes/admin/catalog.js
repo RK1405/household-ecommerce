@@ -11,10 +11,7 @@ const { id, slugify } = require('../../utils/ids');
 const { toCsv, parseCsv } = require('../../utils/csv');
 
 const upload = multer({
-  storage: multer.diskStorage({
-    destination: (req, file, cb) => { fs.mkdirSync(config.paths.uploads, { recursive: true }); cb(null, config.paths.uploads); },
-    filename: (req, file, cb) => cb(null, `${Date.now()}-${slugify(path.parse(file.originalname).name).slice(0, 40)}${path.extname(file.originalname).toLowerCase()}`),
-  }),
+  storage: multer.memoryStorage(),
   limits: { fileSize: 5 * 1024 * 1024 },
   fileFilter: (req, file, cb) => cb(/^image\/(jpeg|png|webp|gif|svg\+xml)$/.test(file.mimetype) ? null : new HttpError(400, 'Only image files are allowed'), true),
 });
@@ -139,7 +136,12 @@ router.delete('/products/:id', (req, res) => {
 });
 
 /** Image upload (multer → /public/uploads). Returns public URLs to put in product.images or CMS. */
-router.post('/uploads', upload.array('images', 8), (req, res) => {
+router.post('/uploads', upload.array('images', 8), async (req, res) => {
+  const files = require('../../db/files');
+  for (const f of req.files || []) {
+    f.filename = `${Date.now()}-${slugify(path.parse(f.originalname).name).slice(0, 40)}${path.extname(f.originalname).toLowerCase()}`;
+    await files.put('uploads', f.filename, f.buffer, f.mimetype);
+  }
   if (!req.files?.length) throw new HttpError(400, 'No images uploaded');
   res.status(201).json({ urls: req.files.map((f) => `/uploads/${f.filename}`) });
 });
