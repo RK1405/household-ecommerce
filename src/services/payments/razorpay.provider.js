@@ -1,43 +1,56 @@
 'use strict';
 /**
- * Razorpay provider — STUB. To go live:
- *   1. npm install razorpay
- *   2. Set PAYMENT_PROVIDER=razorpay, RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET, RAZORPAY_WEBHOOK_SECRET in .env
- *   3. Implement the TODOs below (signatures already match PaymentProvider)
- *   4. On payment.html, replace the simulated form with Razorpay Checkout:
- *        <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
- *        new Razorpay({ key, order_id, amount, handler: (resp) => POST /api/payments/verify with
- *          { razorpay_order_id, razorpay_payment_id, razorpay_signature } }).open()
- *   5. Point a webhook at POST /api/payments/webhook (payment.captured, payment.failed, refund.processed)
+ * Razorpay provider (Orders API + Checkout). Talks to the REST API over HTTPS with Basic auth, so no SDK is needed.
+ * Env: PAYMENT_PROVIDER=razorpay, RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET, RAZORPAY_WEBHOOK_SECRET.
+ * Flow: createOrder (server) -> Razorpay Checkout in the browser -> POST /api/payments/verify (signature)
+ *       -> fetchPayment (amount/order/status check) -> capture if needed -> order paid.  Webhook is the safety net.
+ * Amounts are RUPEES at this interface; they are converted to paise here.
  */
 const crypto = require('crypto');
 const PaymentProvider = require('./PaymentProvider');
 const config = require('../../config');
+const { HttpError } = require('../../middleware/errors');
+
+const paise = (rupees) => Math.round(Number(rupees) * 100);
+const safeEqual = (a, b) => typeof a === 'string' && typeof b === 'string' && a.length === b.length && crypto.timingSafeEqual(Buffer.from(a), Buffer.from(b));
 
 class RazorpayProvider extends PaymentProvider {
   get name() { return 'razorpay'; }
-  client() {
-    // TODO: const Razorpay = require('razorpay');
-    // return new Razorpay({ key_id: config.payments.razorpayKeyId, key_secret: config.payments.razorpayKeySecret });
-    throw new Error('Razorpay SDK not installed — see src/services/payments/razorpay.provider.js');
+  get keyId() { return config.payments.razorpayKeyId; }
+  get isTest() { return /^rzp_test_/.test(this.keyId); }
+
+  async api(method, path, body) {
+    const { razorpayKeyId: id, razorpayKeySecret: secret, razorpayApiBase: base } = config.payments;
+    if (!id || !secret) throw new HttpError(500, 'Razorpay is not configured (RAZORPAY_KEY_ID / RAZORPAY_KEY_SECRET missing).');
+    let res;
+    try {
+      res = await fetch(`${base}${path}`, {
+        method,
+        headers: { Authorization: `Basic ${Buffer.from(`${id}:${secret}`).toString('base64')}`, 'Content-Type': 'application/json' },
+        body: body ? JSON.stringify(body) : undefined,
+        signal: AbortSignal.timeout(20000),
+      });
+    } catch (e) { throw new HttpError(502, `Could not reach Razorpay: ${e.message}`); }
+    const json = await res.json().catch(() => ({}));
+    if (!res.ok) throw new HttpError(res.status === 401 ? 500 : 502, `Razorpay: ${json.error?.description || res.statusText}`);
+    return json;
   }
+
   async createOrder({ amount, currency = 'INR', receipt, notes }) {
-    // Razorpay expects paise
-    return this.client().orders.create({ amount: Math.round(amount * 100), currency, receipt, notes });
+    return this.api('POST', '/orders', { amount: paise(amount), currency, receipt: String(receipt).slice(0, 40), notes });
   }
+  fetchPayment(paymentId) { return this.api('GET', `/payments/${encodeURIComponent(paymentId)}`); }
   verifyPaymentSignature({ orderId, paymentId, signature }) {
     const expected = crypto.createHmac('sha256', config.payments.razorpayKeySecret).update(`${orderId}|${paymentId}`).digest('hex');
-    return expected === signature;
+    return safeEqual(signature, expected);
   }
-  async capture(paymentId, amount) {
-    return this.client().payments.capture(paymentId, Math.round(amount * 100), 'INR');
-  }
-  async refund(paymentId, { amount, notes } = {}) {
-    return this.client().payments.refund(paymentId, { amount: Math.round(amount * 100), notes });
-  }
+  capture(paymentId, amount) { return this.api('POST', `/payments/${encodeURIComponent(paymentId)}/capture`, { amount: paise(amount), currency: 'INR' }); }
+  refund(paymentId, { amount, notes } = {}) { return this.api('POST', `/payments/${encodeURIComponent(paymentId)}/refund`, { amount: paise(amount), notes }); }
   async handleWebhook(rawBody, signatureHeader) {
-    const expected = crypto.createHmac('sha256', config.payments.razorpayWebhookSecret).update(rawBody).digest('hex');
-    if (expected !== signatureHeader) throw new Error('Invalid webhook signature');
+    const secret = config.payments.razorpayWebhookSecret;
+    if (!secret) throw new HttpError(500, 'RAZORPAY_WEBHOOK_SECRET is not set');
+    const expected = crypto.createHmac('sha256', secret).update(rawBody).digest('hex');
+    if (!safeEqual(signatureHeader, expected)) throw new HttpError(400, 'Invalid webhook signature');
     const body = JSON.parse(rawBody);
     return { event: body.event, payload: body.payload };
   }

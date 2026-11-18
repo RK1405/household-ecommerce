@@ -13,7 +13,8 @@
     "seed": "node scripts/seed.js",
     "reset": "node scripts/reset-data.js",
     "images": "node scripts/generate-images.js",
-    "test:e2e": "node tests/e2e.js"
+    "test:e2e": "node tests/e2e.js",
+    "test:razorpay": "node tests/razorpay.test.js"
   },
   "license": "UNLICENSED",
   "private": true,
@@ -26,6 +27,7 @@
     "jsonwebtoken": "^9.0.3",
     "leaflet": "^1.9.4",
     "multer": "^2.5.0",
+    "mysql2": "^3.24.6",
     "nodemailer": "^10.6.0"
   },
   "devDependencies": {

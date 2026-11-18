@@ -24,7 +24,7 @@ async function check(name, fn) {
   catch (e) { results.push({ name, ok: false, ms: Date.now() - t, error: e.message.split('\n')[0] }); console.log(`  ✘ ${name}\n      ${e.message.split('\n')[0]}`); }
 }
 const assert = (c, msg) => { if (!c) throw new Error(msg); };
-const outbox = () => JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'emails.json'), 'utf8'));
+const outbox = () => JSON.parse(execFileSync(process.execPath, [path.join(ROOT, 'scripts', 'dump-collection.js'), 'emails'], { cwd: ROOT, maxBuffer: 64 * 1024 * 1024 }).toString());
 const hasEmail = (type, pred = () => true) => outbox().some((e) => e.type === type && pred(e));
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 

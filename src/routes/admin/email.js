@@ -39,12 +39,12 @@ router.get('/email-templates/:type/preview', (req, res) => {
 });
 
 router.get('/outbox', (req, res) => res.json(repo.emails.all().slice(0, 300)));
-router.get('/outbox/:id', (req, res) => {
+router.get('/outbox/:id', async (req, res) => {
   const e = repo.emails.findById(req.params.id);
   if (!e) throw new HttpError(404, 'Email not found');
-  const f = path.join(config.paths.outbox, path.basename(e.file));
-  if (!fs.existsSync(f)) throw new HttpError(404, 'Email file missing');
-  res.type('html').send(fs.readFileSync(f, 'utf8'));
+  const f = await require('../../db/files').get('outbox', e.file);
+  if (!f) throw new HttpError(404, 'Email file missing');
+  res.type('html').send(f.data.toString('utf8'));
 });
 
 module.exports = router;

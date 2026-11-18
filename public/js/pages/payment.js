@@ -13,7 +13,11 @@ catch (e) { gw.innerHTML = `<div class="gateway-body"><div class="alert alert-da
 const o = info.order;
 if (o.paymentStatus === 'paid' || o.paymentMethod !== 'ONLINE') location.replace(`/order-confirmation.html?order=${o.id}`);
 
-const head = `<div class="gateway-head"><div><div class="xs" style="opacity:.8">${esc(s.cms.store.name)} · Order ${esc(o.orderNo)}</div><div class="amt">${inr(o.total)}</div></div><div style="text-align:right"><div style="font-weight:800">🔒 DemoPay</div><div class="xs" style="opacity:.8">Test mode</div></div></div>`;
+const isRzp = info.provider === 'razorpay';
+if (isRzp) { const n = document.getElementById('gw-note'); if (n) n.textContent = '🔒 Payments are processed securely by Razorpay. We never see or store your card or UPI details.'; }
+let testMode = true;
+const headHtml = () => `<div class="gateway-head"><div><div class="xs" style="opacity:.8">${esc(s.cms.store.name)} · Order ${esc(o.orderNo)}</div><div class="amt">${inr(o.total)}</div></div><div style="text-align:right"><div style="font-weight:800">🔒 ${isRzp ? 'Razorpay' : 'DemoPay'}</div>${testMode ? '<div class="xs" style="opacity:.8">Test mode</div>' : ''}</div></div>`;
+let head = headHtml();
 const luhn = (n) => { let sum = 0; const d = n.replace(/\D/g, ''); for (let i = 0; i < d.length; i++) { let x = Number(d[d.length - 1 - i]); if (i % 2) { x *= 2; if (x > 9) x -= 9; } sum += x; } return d.length >= 12 && sum % 10 === 0; };
 
 function choose(tab = 'UPI', error = '') {
@@ -93,11 +97,49 @@ function otp(r, last4) {
   };
 }
 
+// ---------- Razorpay Checkout (PAYMENT_PROVIDER=razorpay) ----------
+let rzpScript;
+const loadCheckout = () => (window.Razorpay ? Promise.resolve() : (rzpScript ||= new Promise((resolve, reject) => {
+  const el = document.createElement('script'); el.src = 'https://checkout.razorpay.com/v1/checkout.js'; el.onload = resolve;
+  el.onerror = () => { rzpScript = null; reject(new Error('Could not load Razorpay Checkout. Check your internet connection or ad-blocker and try again.')); };
+  document.head.appendChild(el);
+})));
+
+function razorpayStart(error = '') {
+  head = headHtml();
+  gw.innerHTML = `${head}<div class="gateway-body" style="text-align:center">
+    ${o.paymentStatus === 'failed' && !error ? '<div class="alert alert-warning">Your previous payment attempt failed. No money was deducted — please try again.</div>' : ''}
+    ${error ? `<div class="alert alert-danger" role="alert">${esc(error)}</div>` : ''}
+    <h3 style="margin-top:0">Pay ${inr(o.total)} securely</h3>
+    <p class="small muted">UPI, cards, netbanking and wallets are supported. You will complete the payment in Razorpay's secure window.</p>
+    <button class="btn btn-block btn-lg" id="rzp-pay" style="background:#3448b6">Pay ${inr(o.total)}</button>
+    <p class="xs muted mt-4 mb-0"><a href="/account.html#orders">Cancel and go to my orders</a></p></div>`;
+  document.getElementById('rzp-pay').onclick = async (e) => {
+    const btn = e.currentTarget; busy(btn);
+    const reset = (msg) => razorpayStart(msg);
+    try {
+      const [c] = await Promise.all([post(`/api/payments/${o.id}/razorpay-init`, {}), loadCheckout()]);
+      testMode = !!c.testMode; head = headHtml();
+      const rzp = new window.Razorpay({
+        key: c.keyId, order_id: c.orderId, amount: c.amount, currency: c.currency, name: c.name, description: c.description, prefill: c.prefill, theme: { color: '#0f766e' },
+        handler: (r) => finish({ status: 'authorised', razorpay_order_id: r.razorpay_order_id, razorpay_payment_id: r.razorpay_payment_id, razorpay_signature: r.razorpay_signature }),
+        modal: { ondismiss: () => reset('Payment window closed. No money was deducted.') },
+      });
+      rzp.on('payment.failed', async (r) => {
+        const reason = r.error?.description || 'Payment failed';
+        try { await post(`/api/payments/${o.id}/razorpay-failed`, { reason, razorpay_payment_id: r.error?.metadata?.payment_id }); } catch (_) { /* ignore */ }
+        failed(reason);
+      });
+      rzp.open();
+    } catch (err) { reset(err.message); }
+  };
+}
+
 async function finish(res) {
   if (res.status === 'authorised') {
     gw.innerHTML = `${head}<div class="gateway-body upi-wait"><div class="ring" style="--p:100%"><span>⏳</span></div><h3>Verifying payment…</h3></div>`;
     try {
-      await post('/api/payments/verify', { razorpay_order_id: res.razorpay_order_id, razorpay_payment_id: res.razorpay_payment_id, razorpay_signature: res.razorpay_signature });
+      await post('/api/payments/verify', { orderId: o.id, razorpay_order_id: res.razorpay_order_id, razorpay_payment_id: res.razorpay_payment_id, razorpay_signature: res.razorpay_signature });
       gw.innerHTML = `${head}<div class="gateway-body" style="text-align:center"><div class="result-icon ok">✓</div><h2>Payment successful</h2><p class="muted">Payment ID ${esc(res.razorpay_payment_id)}</p><p class="small">Redirecting to your order…</p></div>`;
       setTimeout(() => location.replace(`/order-confirmation.html?order=${o.id}`), 1400);
     } catch (e) { failed(e.message); }
@@ -108,7 +150,7 @@ function failed(reason) {
   o.paymentStatus = 'failed';
   gw.innerHTML = `${head}<div class="gateway-body" style="text-align:center"><div class="result-icon fail">✕</div><h2>Payment failed</h2><p class="muted">${esc(reason)}</p><p class="small">No money was deducted. You can try again with another method.</p>
     <div class="row" style="justify-content:center"><button class="btn" id="retry">Retry payment</button><a class="btn btn-light" href="/account.html#orders">My orders</a></div></div>`;
-  document.getElementById('retry').onclick = () => choose('UPI');
+  document.getElementById('retry').onclick = () => (isRzp ? razorpayStart() : choose('UPI'));
 }
 
-choose('UPI');
+if (isRzp) razorpayStart(); else choose('UPI');

@@ -148,11 +148,12 @@ Browser (HTML + ES modules)  ──fetch──▶  Express /api  ──▶  rout
 ## 6. Plugging in the real services
 
 ### Razorpay (payments)
-1. `npm install razorpay`
-2. In `.env`: `PAYMENT_PROVIDER=razorpay`, `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`, `RAZORPAY_WEBHOOK_SECRET`.
-3. Finish `src/services/payments/razorpay.provider.js`. The methods (`createOrder`, `verifyPaymentSignature`, `capture`, `refund`, `handleWebhook`) already match the `PaymentProvider` interface, and signature verification is implemented.
-4. On `payment.html`, replace the simulated form with Razorpay Checkout (`checkout.razorpay.com/v1/checkout.js`), passing `key`, `order_id = order.gateway.orderId` and `amount`. In the `handler`, POST `{ razorpay_order_id, razorpay_payment_id, razorpay_signature }` to **`/api/payments/verify`**. That endpoint, and everything after it (capture, order → Placed/paid, emails), is unchanged.
-5. Point a Razorpay webhook to `POST /api/payments/webhook`. Handle `payment.captured`, `payment.failed` and `refund.processed` there to cover users who close the browser.
+Implemented against Razorpay's Orders API + Checkout (test and live keys). `npm run test:razorpay` exercises it against a mock Razorpay server.
+1. In the Razorpay Dashboard (Test Mode) generate API keys. Set `RAZORPAY_KEY_ID` and `RAZORPAY_KEY_SECRET`, then `PAYMENT_PROVIDER=razorpay` (on Render: Environment tab).
+2. Webhook (safety net if the customer closes the browser): Dashboard → Settings → Webhooks → add `https://<your-domain>/api/payments/webhook`, choose your own secret, enable `payment.captured`, `payment.failed` (and `payment.authorized`, `refund.processed`), and set the same secret as `RAZORPAY_WEBHOOK_SECRET`.
+3. Flow: the server creates the Razorpay order at checkout; `payment.html` opens Razorpay Checkout; on success `POST /api/payments/verify` checks the HMAC signature, then confirms amount/order/status with Razorpay and captures if needed before marking the order paid. Cancelling or returning a paid order refunds through Razorpay.
+4. Going live needs Razorpay KYC and swapping the `rzp_test_` keys for live keys.
+Test payments: use the test card, UPI and netbanking details on Razorpay's "Test card details" docs page (these are not charged). Razorpay's own test bank page lets you pick success or failure.
 
 ### MySQL (data)
 1. Create the schema: `mysql -u root -p < db/mysql/schema.sql`, then load demo data: `mysql -u root -p < db/mysql/seed.sql`. Both were validated on MariaDB.
@@ -203,7 +204,7 @@ Set `GOOGLE_MAPS_API_KEY=...` in `.env` and enable the **Maps JavaScript API** f
 
 ## 8. Decisions & assumptions
 
-* **Where the code lives.** The run could not reach the GitHub repo-attachment tools (`list_repos` / `add_repo` were not available) and the sandbox's GitHub CLI token was invalid. So the code was built as a **local git repository** (`~/household-ecommerce`) and delivered as a zip that keeps the full `.git` history. Nothing was pushed, and no GitHub repo was created or changed. To publish it: create an empty `RK1405/household-ecommerce`, then `git remote add origin … && git push -u origin main`.
+* **Where the code lives.** GitHub repo `RK1405/household-ecommerce`. The first build was made locally and pushed; later work (MySQL mode, Render deploy) was added on top. Hosting is a free Render web service with a free TiDB (MySQL-compatible) database, see §12.
 * **Store name** "HomeHaat" (*haat* = traditional market) is an invented placeholder, set only in CMS data. All brands (Rasoi Pro, Sundaram Steel, Kaveri Home, Aangan, Dhaaga, Nivaas, Tara Lights, SwachhLine, Ghar Craft, Sahaj, Neelam Linen, UrjaTech) are fictional.
 * **Express 5** with CommonJS on the server and native ES modules in the browser. No build step and no frontend framework, as specified.
 * **Session:** a signed JWT in an httpOnly cookie (not express-session), so sessions survive server restarts without a session store. The TTL is set by `SESSION_TTL_HOURS`.
@@ -218,13 +219,13 @@ Set `GOOGLE_MAPS_API_KEY=...` in `.env` and enable the **Maps JavaScript API** f
 * **Chatbot** is deterministic keyword/intent matching (no AI). Order tracking returns only status information (no personal data), keyed by order number.
 * **Reviews and Customers** are intentionally not connected to storage (spec item 22). The *Contact enquiries* list on the Customers page is real data.
 * **PIN-code delivery check** on the product page is a demo estimate (no courier API).
-* **Demo mode** (`DEMO_MODE=true`) shows demo credentials and forces every email into the outbox, whatever the SMTP settings say.
+* **Demo mode** (`DEMO_MODE=true`) forces every email into the outbox, whatever the SMTP settings say. `SHOW_DEMO_LOGINS` (defaults to the `DEMO_MODE` value) controls whether the demo credentials appear on the login pages; `render.yaml` sets it to `false`.
 
 ## 9. Known gaps / next steps
 
-1. **Push to GitHub** (see above) and choose hosting. Set `BASE_URL`, a strong `SESSION_SECRET`, `NODE_ENV=production` (enables `Secure` cookies) and HTTPS.
-2. **Razorpay:** finish `razorpay.provider.js`, add Checkout on `payment.html` and set up webhooks (§6). Add a "switch to COD" option after a failed payment.
-3. **MySQL repositories:** the schema and seed are ready; the repository implementations are not. Same for the Reviews/Customers MySQL/Salesforce adapters.
+1. **Hosting hardening.** The demo runs on Render's free plan (sleeps when idle). Before real customers: a paid always-on instance, a custom domain, and `BASE_URL` set to it. `NODE_ENV=production`, a generated `SESSION_SECRET` and HTTPS are already set by `render.yaml`. Change the seeded admin password (`admin@demo.com`) on any public site.
+2. **Razorpay:** integrated (§6) and tested against a mock; test against real Razorpay test keys, then complete KYC for live. Add a "switch to COD" option after a failed payment.
+3. **Relational MySQL tables:** MySQL mode (§12) stores records as JSON documents in `hh_documents`. The normalised schema in `db/mysql/` is ready but not wired in; moving to it means writing per-entity repositories. The Reviews/Customers MySQL/Salesforce adapters are still TODO.
 4. **Google Maps:** test with a real key. Optionally add Places autocomplete and reverse geocoding to pre-fill city, state and PIN from the pin.
 5. **Security hardening for production:** CSRF tokens (SameSite=Lax cookies mitigate most cases today), rate limiting beyond the login limiter, HTML sanitising of CMS page content (currently trusted admin HTML), upload virus scanning, and audit logs for admin actions.
 6. **Admin roles:** there is one `admin` role. Add granular roles (catalogue manager, support, finance) if needed.
@@ -241,3 +242,9 @@ Set `GOOGLE_MAPS_API_KEY=...` in `.env` and enable the **Maps JavaScript API** f
 register, both demo logins, forgot password · admin route protection · browse, filter, sort, search, paginate · quick view · zoom (lens + fullscreen) · share link OG tags + correct product + copy link/image link · guest cart persistence + merge on login · coupon messages (expired, invalid, valid) · address validation + map pin via current location · COD checkout + COD limit · UPI success/failure · card success/decline/invalid Luhn/wrong OTP · confirmation page · outbox emails (welcome, reset, order placed, payment success/failed, shipped, out for delivery, refund, contact) · admin status change → email · GST invoice · product, coupon and banner CRUD reflected on the storefront · reports + CSV · refund + reconciliation · email settings · every chatbot intent · every page at **360, 390, 768 and 1366 px** checked for console errors, broken images, missing alt text and horizontal scroll, plus the mobile sticky add-to-cart, tap-to-zoom and hamburger menu.
 
 The latest run: **37/37 passed, 0 console/network issues** — see `docs/test-report.md`. Screenshots are in `docs/screenshots/` (`home-desktop.png`, `home-mobile.png`, `product-desktop.png`, `product-mobile.png`, `admin-dashboard.png`, …).
+
+## 12. MySQL mode and Render deployment
+
+`DATA_PROVIDER=mysql` stores everything in MySQL instead of `/data` files: records go in table `hh_documents` (one JSON row per record), admin uploads and email HTML in `hh_files`. Tables are created and the demo data is seeded automatically on first start. All data is cached in memory and written through to MySQL, so **run a single app instance**. `npm run reset` wipes and re-seeds the MySQL tables. The relational `db/mysql/schema.sql` is for the later move to normalised tables and is not used by this mode.
+
+Deploy: create a MySQL database (e.g. TiDB Cloud Serverless), then on Render create a Blueprint from this repo (`render.yaml`) and set `MYSQL_URL` and `BASE_URL`. The free Render plan sleeps after ~15 minutes idle.

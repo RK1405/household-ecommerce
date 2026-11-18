@@ -1,4 +1,5 @@
 'use strict';
+const files = require('../db/files');
 /**
  * Email service. In demo mode (DEMO_MODE=true, or the admin toggle) emails are NEVER sent:
  * the rendered HTML is written to storage/outbox and indexed in data/emails.json.
@@ -27,8 +28,7 @@ async function send(type, to, data = {}) {
   const { subject, html } = templates.render(type, data, { store, baseUrl: baseUrl() });
   const stamp = new Date().toISOString().replace(/[:.]/g, '-');
   const file = `${stamp}_${type}_${id()}.html`;
-  fs.mkdirSync(config.paths.outbox, { recursive: true });
-  fs.writeFileSync(path.join(config.paths.outbox, file), html);
+  await files.put('outbox', file, html, 'text/html; charset=utf-8');
   const record = { id: id('em_'), type, label: templates.LABELS[type], to, subject, file, orderNo: data.order?.orderNo || null, status: 'outbox', createdAt: new Date().toISOString() };
   if (!demoMode && smtp.host) {
     try {
