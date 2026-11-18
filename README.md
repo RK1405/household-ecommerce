@@ -153,7 +153,7 @@ Implemented against Razorpay's Orders API + Checkout (test and live keys). `npm 
 2. Webhook (safety net if the customer closes the browser): Dashboard → Settings → Webhooks → add `https://<your-domain>/api/payments/webhook`, choose your own secret, enable `payment.captured`, `payment.failed` (and `payment.authorized`, `refund.processed`), and set the same secret as `RAZORPAY_WEBHOOK_SECRET`.
 3. Flow: the server creates the Razorpay order at checkout; `payment.html` opens Razorpay Checkout; on success `POST /api/payments/verify` checks the HMAC signature, then confirms amount/order/status with Razorpay and captures if needed before marking the order paid. Cancelling or returning a paid order refunds through Razorpay.
 4. Going live needs Razorpay KYC and swapping the `rzp_test_` keys for live keys.
-Test payments: use Razorpay's test cards/UPI (e.g. card `4111 1111 1111 1111`, any future expiry/CVV, OTP `1234`; UPI `success@razorpay` / `failure@razorpay`), see razorpay.com/docs/payments/payments/test-card-details.
+Test payments: use the test card, UPI and netbanking details on Razorpay's "Test card details" docs page (these are not charged). Razorpay's own test bank page lets you pick success or failure.
 
 ### MySQL (data)
 1. Create the schema: `mysql -u root -p < db/mysql/schema.sql`, then load demo data: `mysql -u root -p < db/mysql/seed.sql`. Both were validated on MariaDB.
