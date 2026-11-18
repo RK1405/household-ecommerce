@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en-IN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Returns · Admin</title>
+  <meta name="robots" content="noindex">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/css/tokens.css">
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/store.css">
+  <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body>
+  <div id="admin-shell">
+    <section class="kpis" id="counts"></section>
+    <section class="panel mt-4"><div class="panel-head"><h2>Return requests</h2><span class="small muted">We pay for return pickup. Online orders refund automatically when you mark items received; Cash on Delivery refunds are paid by you to the customer's UPI ID.</span></div>
+      <div class="filters-bar"><input type="search" class="input" id="q" placeholder="Return no., order no., customer" aria-label="Search returns"><select class="input" id="st" aria-label="Status"><option value="">All statuses</option></select></div>
+      <div class="table-wrap"><table class="table"><thead><tr><th>Return</th><th>Order</th><th>Customer</th><th>Items</th><th>Reason</th><th>Payment</th><th class="num">Refund</th><th>Status</th><th></th></tr></thead><tbody id="rows"></tbody></table></div></section>
+  </div>
+  <script type="module" src="/admin/js/returns.js"></script>
+</body>
+</html>

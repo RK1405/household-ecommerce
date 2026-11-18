@@ -14,7 +14,8 @@
     "reset": "node scripts/reset-data.js",
     "images": "node scripts/generate-images.js",
     "test:e2e": "node tests/e2e.js",
-    "test:razorpay": "node tests/razorpay.test.js"
+    "test:razorpay": "node tests/razorpay.test.js",
+    "test:returns": "node tests/returns.test.js"
   },
   "license": "UNLICENSED",
   "private": true,

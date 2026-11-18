@@ -36,6 +36,7 @@ document.getElementById('pdp').innerHTML = `<div class="pdp">
     <p class="xs muted">MRP inclusive of all taxes · GST ${p.gstRate}% included${pr.promotion ? ` · ${esc(pr.promotion.name)} applied` : ''}${pr.onSale ? ` · Sale ends ${date(pr.saleEnd)}` : ''}</p>
     ${pr.promotion?.dealOfDay ? `<div class="alert alert-warning">⚡ <strong>Deal of the Day</strong> — extra ${inr(pr.promotion.amount)} off, today only.</div>` : ''}
     <p style="font-weight:700;color:${p.inStock ? (p.lowStock ? 'var(--c-warning)' : 'var(--c-success)') : 'var(--c-danger)'}">${p.inStock ? (p.lowStock ? `Hurry! Only ${p.stock} left in stock` : '✓ In stock') : 'Currently out of stock'}</p>
+    <p class="small" id="return-note" style="margin:0 0 8px">${p.returnPolicy?.days > 0 ? `↩️ <strong>${p.returnPolicy.days}-day easy returns</strong> <span class="muted">· free pickup</span>` : `🚫 <strong>No returns</strong> <span class="muted">${p.returnPolicy?.reason === 'under-min-price' ? `· products under ${inr(p.returnPolicy.minPrice)} are not returnable` : '· this product is not returnable'}</span>`}</p>
     <div class="buy-row" id="buy-row">
       <div class="qty" id="qty"><button type="button" data-d="-1" aria-label="Decrease quantity">−</button><input id="qty-input" type="number" min="1" max="${maxQty || 1}" value="1" aria-label="Quantity"><button type="button" data-d="1" aria-label="Increase quantity">+</button></div>
       <button class="btn btn-outline btn-lg" id="add-btn" ${p.inStock ? '' : 'disabled'}>${icon('cart')} Add to cart</button>

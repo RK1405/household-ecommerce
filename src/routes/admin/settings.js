@@ -27,7 +27,8 @@ router.put('/settings', (req, res) => {
   if (cod.maxOrderValue <= 0) throw new HttpError(400, 'COD limit must be greater than 0');
   const tax = { ...cur.tax, ...(b.tax || {}) };
   if (tax.gstin && !/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z][1-9A-Z]Z[0-9A-Z]$/.test(tax.gstin)) throw new HttpError(400, 'GSTIN format looks invalid (15 characters, e.g. 33AABCH1234Z1Z5)');
-  repo.settings.patch({ delivery, cod, tax, lowStockThreshold: n(b.lowStockThreshold, cur.lowStockThreshold) });
+  const returns = { minPrice: Math.max(0, n(b.returns?.minPrice, cur.returns?.minPrice ?? 1000)) };
+  repo.settings.patch({ delivery, cod, tax, returns, lowStockThreshold: n(b.lowStockThreshold, cur.lowStockThreshold) });
   res.json({ ok: true });
 });
 

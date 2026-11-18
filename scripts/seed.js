@@ -50,6 +50,7 @@ function buildSeed(now = Date.now()) {
       images: ['main', 'alt', 'closeup'].map((v) => `/images/products/${slug}/${v}.jpg`),
       illustration: { shape, color },
       weightKg: 0.5 + (i % 6) * 0.4,
+      returnWindowDays: category === 'cleaning' ? 0 : category === 'small-appliances' ? 10 : 7,
       active: true,
       createdAt: iso(created), updatedAt: iso(created),
     };
@@ -192,7 +193,7 @@ function buildSeed(now = Date.now()) {
     },
     pages: [
       { slug: 'about', title: 'About HomeHaat', active: true, content: '<p>HomeHaat (a placeholder demo brand) brings together everyday household essentials inspired by the Indian <em>haat</em> — the neighbourhood market where quality and value meet.</p><h2>What we believe</h2><ul><li>Durable products that suit Indian kitchens and homes</li><li>Honest, GST-inclusive pricing</li><li>Delivery across India with Cash on Delivery</li></ul><p>This website is a demo built for review purposes. Brands and products are fictional.</p>' },
-      { slug: 'shipping-returns', title: 'Shipping & Returns', active: true, content: '<h2>Shipping</h2><ul><li><strong>Standard delivery</strong>: ₹79, free on orders of ₹999 and above. 4–6 working days.</li><li><strong>Express delivery</strong>: ₹149. 1–2 working days in metro cities.</li><li>We ship to all serviceable PIN codes across India.</li></ul><h2>Cash on Delivery</h2><p>COD is available on orders up to ₹10,000.</p><h2>Returns & refunds</h2><ul><li>Return any unused product within <strong>7 days</strong> of delivery.</li><li>Refunds to the original payment method in 5–7 working days. COD refunds go to your bank account/UPI.</li><li>Electrical appliances are covered by the brand warranty after the return window.</li></ul>' },
+      { slug: 'shipping-returns', title: 'Shipping & Returns', active: true, content: '<h2>Shipping</h2><ul><li><strong>Standard delivery</strong>: ₹79, free on orders of ₹999 and above. 4–6 working days.</li><li><strong>Express delivery</strong>: ₹149. 1–2 working days in metro cities.</li><li>We ship to all serviceable PIN codes across India.</li></ul><h2>Cash on Delivery</h2><p>COD is available on orders up to ₹10,000.</p><h2>Returns & refunds</h2><ul><li>Each product shows its own return window (usually <strong>7 or 10 days</strong> after delivery). Some products are not returnable.</li><li><strong>Products priced under ₹1,000 are not returnable.</strong></li><li>Return pickup is <strong>free</strong> — we arrange and pay for it. Start a return from My Account → Orders once your order is delivered.</li><li>Online payments are refunded to the original payment method in 5–7 working days after we receive the items. For Cash on Delivery we send the refund to the UPI ID you give us.</li><li>Electrical appliances are covered by the brand warranty after the return window.</li></ul>' },
       { slug: 'privacy', title: 'Privacy Policy', active: true, content: '<p>This is a placeholder privacy policy for the demo store. We collect only the information needed to process your orders — name, contact details, delivery address and order history — and never sell it to third parties.</p><p>Payments are processed by our payment partner; we do not store card numbers.</p><p>Replace this text with your legal team\'s policy, compliant with the Digital Personal Data Protection Act, 2023.</p>' },
       { slug: 'terms', title: 'Terms of Use', active: true, content: '<p>These are placeholder terms for the demo store. By using this website you agree to our policies on orders, pricing, delivery and returns.</p><p>All prices are in Indian Rupees (₹) and inclusive of GST. Product images are illustrative.</p><p>Disputes are subject to the jurisdiction of courts in Chennai, Tamil Nadu.</p>' },
     ],
@@ -207,6 +208,7 @@ function buildSeed(now = Date.now()) {
     cod: { enabled: true, maxOrderValue: 10000, minOrderValue: 0 },
     tax: { pricesIncludeGst: true, gstin: '33AABCH1234Z1Z5', legalName: 'HomeHaat Retail Pvt. Ltd. (demo)', state: 'Tamil Nadu', invoicePrefix: 'HH/INV/' },
     lowStockThreshold: 5,
+    returns: { minPrice: 1000 },
     email: {
       smtp: { host: '', port: 587, secure: false, user: '', pass: '', from: 'HomeHaat <no-reply@homehaat.example>' },
       demoMode: true,
@@ -215,7 +217,7 @@ function buildSeed(now = Date.now()) {
     },
   };
 
-  return { categories, products, users, orders, payments, coupons, promotions, cms, settings, carts: [], contacts: [], emails: [] };
+  return { categories, products, users, orders, payments, coupons, promotions, cms, settings, carts: [], contacts: [], emails: [], returns: [] };
 }
 
 function writeSeed({ force = false } = {}) {
